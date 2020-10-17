@@ -82,6 +82,7 @@ class Network():
         tmp_edge = Edge(origin, end, weight=weight, probability=probability)
         tmp_edge.index = len(self.edge)
         self.node[origin.index].add_edge(tmp_edge)
+        self.weight+=weight
         self.n_edges+=1
 
     def add_microstate(self, name, node_index=None):
@@ -104,9 +105,12 @@ class Network():
             origin = self.microstates[origin].node.index
             end = self.microstates[end].node.index
 
-        self.node[origin].edge[end].weight+=weight
-        self.node[origin].weight+=weight
-        self.weight+=weight
+        if end not in self.node[origin].edge:
+            self.add_edge(origin=origin, end=end, weight=weight)
+        else:
+            self.node[origin].edge[end].weight+=weight
+            self.node[origin].weight+=weight
+            self.weight+=weight
 
     def __call__(self):
 

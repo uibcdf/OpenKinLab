@@ -28,6 +28,7 @@ class Node():
             raise ValueError("The edge is already included in this network.")
 
         self.edge[edge.end.index]=edge
+        self.weight+=edge.weight
         self.n_edges+=1
 
     #def most_weighted_links(self,length=1):
