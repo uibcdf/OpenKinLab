@@ -1,8 +1,8 @@
 
-.. openkinnet documentation master file
+.. openkinlab documentation master file
 
 ==========
-OpenKinNet
+OpenKinLab
 ==========
 
 .. toctree::

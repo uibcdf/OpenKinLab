@@ -1,0 +1,43 @@
+from pynoramix import *
+import pylab
+
+net=network(directed=True, kinetic=True)
+
+fff=open('trad_aux.aux','r')
+for line in fff.readlines():
+    xx=line.split()
+    net.add_node(label=xx[1])
+
+fff.close()
+
+
+fff=open('net.oup','r')
+for line in fff.readlines():
+    xx=line.split()
+    net.add_link((int(xx[0])-1),(int(xx[1])-1),float(xx[2]),index_origin=True, index_final=True)
+
+fff.close()
+
+net.symmetrize(new=False)
+
+
+xx=numpy.zeros(shape=net.num_nodes,dtype=float)
+yy=numpy.zeros(shape=net.num_nodes,dtype=float)
+
+for ii in range(net.num_nodes):
+    xx[ii]=float(net.node[ii].label)
+    yy[ii]=float(net.node[ii].weight)
+
+
+net.gradient_clusters()
+
+xx_yy_cluster=[]
+
+for ii in range(net.num_clusters):
+    palcluster=[]
+    for jj in net.cluster[ii].nodes:
+        palcluster.append([float(net.node[jj].label),net.node[jj].weight])
+    palcluster=numpy.array(palcluster)
+    xx_yy_cluster.append(palcluster)
+
+

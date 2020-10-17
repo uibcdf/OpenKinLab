@@ -22,13 +22,13 @@ import sphinx_rtd_theme
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('./../openkinnet'))
+sys.path.insert(0, os.path.abspath('./../openkinlab'))
 
 print(sys.path)
 
 # -- Project information -----------------------------------------------------
 
-project = 'OpenKinNet'
+project = 'OpenKinLab'
 copyright = '2020, UIBCDF Lab at the Mexico City Childrens Hospital Federico Gomez and authors'
 author = 'Liliana M. Moreno Vargas & Diego Prada Gracia'
 
@@ -164,7 +164,7 @@ html_css_files = [
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'openkinnetdoc'
+htmlhelp_basename = 'openkinlabdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
