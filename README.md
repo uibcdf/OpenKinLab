@@ -1,1 +1,1 @@
-# OpenKinLab
+# OpenKTN
