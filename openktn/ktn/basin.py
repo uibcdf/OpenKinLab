@@ -1,6 +1,6 @@
 from openktn.ktn import Node
 
-class Component():
+class Basin():
 
     def __init__(self, nodes=None, index=None):
 
@@ -26,12 +26,15 @@ class Component():
             nodes=[nodes]
 
         for node in nodes:
-
-            node.component=self
+            node.basin=self
             self.node.add(node)
-            self.edge.union(set(node.edge.values()))
             self.weight+=node.weight
             self.probability+=node.probability
+
+        for node in self.node:
+            for edge in node.edge.values():
+                if edge.end.basin==self:
+                    self.edge.add(edge)
 
         self.n_nodes=len(self.node)
         self.n_edges=len(self.edge)

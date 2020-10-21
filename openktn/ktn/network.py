@@ -2,19 +2,20 @@ import numpy as np
 from .node import Node
 from .edge import Edge
 from .microstate import Microstate
+from .component import Component
 from .t_arrays import TArrays
 import simtk.unit as unit
-from libnetwork import network as lib_network
 
 class Network():
 
-    def __init__(self, n_nodes=0, microstate_names=None, time_step=None):
+    def __init__(self, n_nodes=0, microstate_names=None, time_step=None, temperature=None):
 
         self.n_nodes=0
         self.n_edges=0
         self.n_clusters=0
         self.n_components=0
         self.time_step=None
+        self.temperature=None
 
         self.node=[]
         self.edge=[]
@@ -25,7 +26,7 @@ class Network():
         self.weight=0
 
         self.symmetrized=False
-        self.T_arrays = None
+        self.Ts = None
 
 
         if n_nodes>0:
@@ -48,13 +49,25 @@ class Network():
         if time_step is not None:
             self.time_step = time_step.in_units_of(unit.nanoseconds)
 
-    def _reset_components(self):
+        if temperature is not None:
+            self.temperature = temperature.in_units_of(unit.kelvin)
+
+
+    def reset_components(self):
 
         self.n_components=0
         self.component=[]
 
         for node in self.node:
             node.component=None
+
+    def reset_basins(self):
+
+        self.n_basins=0
+        self.basin=[]
+
+        for node in self.node:
+            node.basin=None
 
     def update_weights(self):
 
@@ -75,7 +88,7 @@ class Network():
         print('{} edges'.format(self.n_edges))
         print('{} weight'.format(self.weight))
 
-    def add_node(self, microstate_name=None, id=None, weight=0, probability=None):
+    def add_node(self, microstate_name=None, id=None, weight=0.0, probability=0.0):
 
         tmp_microstate = None
         if microstate_name is not None:
@@ -95,7 +108,7 @@ class Network():
             tmp_microstate.node = tmp_node
             tmp_node.microstate = tmp_microstate
 
-    def add_edge(self, origin=None, end=None, weight=0, probability=None, with_microstates=False):
+    def add_edge(self, origin=None, end=None, weight=0.0, probability=0.0, with_microstates=False):
 
         if with_microstates:
             origin = self.microstates[origin].node
@@ -140,6 +153,13 @@ class Network():
             self.node[origin].weight+=weight
             self.weight+=weight
 
+    def add_component(self, nodes=None):
+
+        component_index=self.n_components
+        tmp_component=Component(nodes, component_index)
+        self.component.append(tmp_component)
+        self.n_components+=1
+
     def copy(self):
         from copy import deepcopy
         return deepcopy(self)
@@ -174,19 +194,17 @@ class Network():
         for edge in self.edge:
             edge.probability=edge.weight/edge.origin.weight
 
-    def update_Ts(self):
+        self._update_Ts()
 
-        self.T_arrays = TArrays(self)
+    def _update_Ts(self):
 
-    def get_components(self, Ts_init=False):
+        self.Ts = TArrays(self)
 
-        if not Ts_init:
+    #def get_most_likely(self, target='node', indices='all', selection=None, output='node', top=1):
+    #    raise NotImplementedError
 
-            self.update_Ts()
-
-        n_components, component_index_per_node = lib_network.components()
-
-        return n_components, component_index_per_node
+    #def select(self):
+    #    raise NotImplementedError
 
     def __call__(self):
 

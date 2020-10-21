@@ -1,6 +1,10 @@
 import numpy as np
 from .utils.nodes import digest_indices as _digest_node_indices
 from .utils.edges import digest_indices as _digest_edge_indices
+from .lib import network as libnetwork
+
+def most_likely():
+    pass
 
 def most_weighted_nodes(network, indices='all', top=1):
 
@@ -54,6 +58,38 @@ def local_minima(network):
 
     return output
 
-def components(network):
+def components(network, node_indices='all', selection=None, in_place=True):
 
-    pass
+    if network.Ts is None:
+        network._update_Ts()
+
+    n_components, component_index_per_node = libnetwork.components(network.Ts.start,
+            network.Ts.ind, network.n_nodes, network.n_edges)
+
+    if in_place:
+
+        network.reset_components()
+
+        for _ in range(n_components):
+            network.add_component()
+
+        for node in network.node:
+            component_index=component_index_per_node[node.index]
+            network.component[component_index].add_nodes(node)
+
+    else:
+
+        output=[]
+        for _ in range(n_components):
+            output.append(set())
+        for node in network.node:
+            component_index=component_index_per_node[node.index]
+            output[component_index].add(node)
+
+        return output
+
+def density_of_states(network, n_bins=100):
+
+    # density of microstates in the Free energy axe
+
+    raise NotImplementedError
