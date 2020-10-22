@@ -1,6 +1,6 @@
 from openktn.ktn import Node
 
-class Basin():
+class Component():
 
     def __init__(self, nodes=None, index=None):
 
@@ -13,6 +13,10 @@ class Basin():
         self.edge=set()
         self.weight=0.0
         self.probability=0.0
+        self.frames=[]
+
+        self.global_minimum=None
+        self.local_minima=None
 
         self.symmetrized=False
         self.T_arrays=None
@@ -26,17 +30,23 @@ class Basin():
             nodes=[nodes]
 
         for node in nodes:
-            node.basin=self
+
+            node.component=self
             self.node.add(node)
+            self.edge.union(set(node.edge.values()))
             self.weight+=node.weight
             self.probability+=node.probability
-
-        for node in self.node:
-            for edge in node.edge.values():
-                if edge.end.basin==self:
-                    self.edge.add(edge)
 
         self.n_nodes=len(self.node)
         self.n_edges=len(self.edge)
 
+   def set_name(self):
+
+        if self.global_minimum is None:
+
+            weights = np.array([network.node[ii].weight for ii in range(self.n_nodes)])
+            aux=np.argsort(weights)[-1:][::-1][0]
+            self.global_minimum = self.node[aux]
+
+        self.name = self.global_minimum.microstate.name
 
