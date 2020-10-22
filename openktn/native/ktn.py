@@ -110,7 +110,7 @@ class KTN():
 
         raise NotImplementedError
 
-    def add_component(self, microstate_indices=None):
+    def add_component(self, microstate_indices=None, selection=None):
 
         raise NotImplementedError
         #component_index=self.n_components
@@ -118,7 +118,7 @@ class KTN():
         #self.component.append(tmp_component)
         #self.n_components+=1
 
-    def remove_components(self, indices=None):
+    def remove_components(self):
 
         raise NotImplementedError
 
