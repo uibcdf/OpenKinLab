@@ -12,3 +12,11 @@ class KineticTransitionNetwork():
         for attr, value in attributes.items():
             setattr(self, attr, value)
 
+    def n_microstates(self):
+
+        return self.microstates_dataframe.shape[0]
+
+    def n_transitions(self):
+
+        return self.transitions_dataframe.shape[0]
+
