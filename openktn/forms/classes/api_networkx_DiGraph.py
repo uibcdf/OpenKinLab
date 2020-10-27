@@ -139,6 +139,10 @@ def symmetrize(ktn):
 
     ktn.graph['symmetrized']=True
 
+def select(ktn, selection):
+
+    raise NotImplementedError
+
 # Convert
 
 # Get

@@ -23,6 +23,7 @@ dict_transition_in_ktn={}
 dict_update_weights={}
 dict_update_probabilities={}
 dict_symmetrize={}
+dict_select={}
 dict_get={}
 
 for api_form in list_api_forms:
@@ -37,6 +38,11 @@ for form_name in list_forms:
     dict_new_empty_ktn[form_name]= {}
     dict_add_microstate[form_name]= {}
     dict_add_transition[form_name]= {}
+    dict_microstate_in_ktn[form_name]= {}
+    dict_transition_in_ktn[form_name]= {}
+    dict_update_weights[form_name]= {}
+    dict_update_probabilities[form_name]= {}
+    dict_select[form_name]= {}
     dict_get[form_name]= {}
 
     for target_name in _target_names:
@@ -71,6 +77,8 @@ for form_name in list_forms:
         dict_update_probabilities[form_name]=getattr(dict_api_forms[form_name],'update_probabilities')
     if 'symmetrize' in dict_api_forms[form_name].__dict__.keys():
         dict_symmetrize[form_name]=getattr(dict_api_forms[form_name],'symmetrize')
+    if 'select' in dict_api_forms[form_name].__dict__.keys():
+        dict_select[form_name]=getattr(dict_api_forms[form_name],'select')
 
 list_forms=sorted(list_forms)
 

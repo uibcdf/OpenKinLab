@@ -1,18 +1,29 @@
 names=["network", "microstate", "transition", "component", "basin"]
 
-def singular(argument):
+singular_to_plural={
+        "network" : "networks",
+        "microstate" : "microstates",
+        "transition" : "transitions",
+        "component" : "components",
+        "basin" : "basins"}
 
-    if argument.endswith('s'):
-        if argument=="networks":
-            return "network"
-        elif argument=="microstates":
-            return "microstate"
-        elif argument=="transitions":
-            return "transition"
-        elif argument=="components":
-            return "component"
-        elif argument=="basins":
-            return "basin"
+plural_to_singular = {value:key for key,value in singular_to_plural.items()}
 
-    return argument
+def to_singular(target):
+
+    output = target
+    if target in plural_to_singular:
+        output = plural_to_singular[target]
+
+    return output
+
+def to_plural(target):
+
+    output = target
+    if target in singular_to_plural:
+        output = singular_to_plural[target]
+
+    return output
+
+
 

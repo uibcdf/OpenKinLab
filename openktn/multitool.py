@@ -1,6 +1,7 @@
 import numpy as np
 import simtk.unit as unit
-from .utils.targets import singular as targets_singular
+from .utils.targets import to_singular as singular_target
+from .utils.indices import intersection_indices
 
 # Classes
 
@@ -13,6 +14,7 @@ from .forms.classes import dict_is_form as dict_classes_is_form, \
         dict_update_weights as dict_classes_update_weights, \
         dict_update_probabilities as dict_classes_update_probabilities, \
         dict_symmetrize as dict_classes_symmetrize, \
+        dict_select as dict_classes_select, \
         dict_get as dict_classes_get
 
 # Files
@@ -26,6 +28,7 @@ from .forms.files import dict_is_form as dict_files_is_form, \
         dict_update_weights as dict_files_update_weights, \
         dict_update_probabilities as dict_files_update_probabilities, \
         dict_symmetrize as dict_files_symmetrize, \
+        dict_select as dict_files_select, \
         dict_get as dict_files_get
 
 dict_is_form = {**dict_classes_is_form, **dict_files_is_form}
@@ -37,6 +40,7 @@ dict_transition_in_ktn = {**dict_classes_transition_in_ktn, **dict_files_transit
 dict_update_weights = {**dict_classes_update_weights, **dict_files_update_weights}
 dict_update_probabilities = {**dict_classes_update_probabilities, **dict_files_update_probabilities}
 dict_symmetrize = {**dict_classes_symmetrize, **dict_files_symmetrize}
+dict_select = {**dict_classes_select, **dict_files_select}
 dict_get = {**dict_classes_get, **dict_files_get}
 
 def get_form(ktn):
@@ -91,10 +95,45 @@ def update_probabilities(ktn):
 
     return dict_update_probabilities[form](ktn)
 
+def select(ktn, selection='all', target='microstate', mask=None):
+
+    form = get_form(ktn)
+
+    if type(selection)==str:
+        if selection in ['all', 'All', 'ALL']:
+            n_microstates = dict_get[form]['network']['n_microstates'](ktn)
+            microstate_indices = np.arange(n_microstates, dtype='int64')
+        else:
+            microstate_indices = dict_selector[form](ktn, selection)
+    elif type(selection) in [int, _int64, _int]:
+        microstate_indices = np.array([selection], dtype='int64')
+    elif hasattr(selection, '__iter__'):
+        microstate_indices = np.array(selection, dtype='int64')
+    else :
+        microstate_indices = None
+
+    output_indices = None
+
+    if target=='microstate':
+        output_indices = microstate_indices
+    elif target=='component':
+        output_indices = get(item, target='microstate', indices=microstate_indices, component_index=True)
+        output_indices = _unique(output_indices)
+    elif target=='basin':
+        output_indices = get(item, target='microstate', indices=microstate_indices, basin_index=True)
+        output_indices = _unique(output_indices)
+    elif target=='transition':
+        output_indices = get(item, target='microstate', indices=microstate_indices, inner_transition_index=True)
+
+    if mask is not None:
+        output_indices = intersection_indices(output_indices,mask)
+
+    return output_indices
+
 def get(ktn, target='microstate', indices=None, selection='all', **kwargs):
 
     form = get_form(ktn)
-    target = targets_singular(target)
+    target = singular_target(target)
     attributes = [ key for key in kwargs.keys() if kwargs[key] ]
 
     if type(indices)==str:
@@ -135,7 +174,7 @@ def info(ktn, target='network', indices=None, selection='all', output='dataframe
 
         from pandas import DataFrame as df
         form = get_form(ktn)
-        target = targets_singular(target)
+        target = singular_target(target)
 
         if target=='microstate':
 
