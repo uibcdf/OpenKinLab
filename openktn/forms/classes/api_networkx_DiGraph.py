@@ -33,8 +33,13 @@ def new_empty_ktn(time_step=0.0*nanoseconds, temperature=0.0*kelvin):
     for attribute, value in transition_attributes.items():
         set_edge_attributes(ktn, value, attribute)
 
-    ktn.graph['time_step']=time_step.in_units_of(nanoseconds)
-    ktn.graph['temperature']=temperature.in_units_of(kelvin)
+    aux = time_step.in_units_of(nanoseconds)
+    aux._value = np.round(aux._value, 6)
+    ktn.graph['time_step']=aux
+
+    aux=temperature.in_units_of(kelvin)
+    aux._value = np.round(aux._value, 3)
+    ktn.graph['temperature']=aux
 
     ktn.__setattr__('index_to_name',[])
 
@@ -55,10 +60,37 @@ def add_microstate(ktn, name=None):
 
 def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=False):
 
-    index = ktn.number_of_edges()
+    if origin_index:
+        origin = get_microstate_name_from_microstate(ktn, indices=origin)
+    else:
+        if not microstate_in_ktn(ktn, origin):
+            add_microstate(ktn, origin)
 
-    transition_attributes['index']=index
-    transition_attributes['weight']=weight
+    if end_index:
+        end = get_microstate_name_from_microstate(ktn, indices=end)
+    else:
+        if not microstate_in_ktn(ktn, end):
+            add_microstate(ktn, end)
+
+    if not transition_in_ktn(ktn, origin, end):
+
+        index = ktn.number_of_edges()
+        transition_attributes['index']=index
+        transition_attributes['weight']=weight
+        ktn.add_edge(origin, end, **transition_attributes)
+        ktn.nodes[origin]['weight']+=weight
+        ktn.graph['weight']+=weight
+
+    else:
+        ktn[origin][end]['weight']+=weight
+        ktn.nodes[origin]['weight']+=weight
+        ktn.graph['weight']+=weight
+
+def microstate_in_ktn(ktn, name):
+
+    return (name in ktn.nodes)
+
+def transition_in_ktn(ktn, origin, end, origin_index=False, end_index=False):
 
     if origin_index:
         origin = get_microstate_name_from_microstate(ktn, indices=origin)
@@ -66,7 +98,46 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
     if end_index:
         end = get_microstate_name_from_microstate(ktn, indices=end)
 
-    ktn.add_edge(origin, end, **transition_attributes)
+    return ([origin, end] in ktn.edges)
+
+def update_weights(ktn):
+
+    ktn.graph['weight']=0.0
+    ktn.nodes(data='weight', default=0.0)
+
+    for origin, end, weight in ktn.edges(data='weight'):
+        ktn.nodes[origin]['weight']+=weight
+        ktn.graph['weight']+=weight
+
+def update_probabilities(ktn):
+
+    ktn.nodes(data='probability', default=0.0)
+    ktn.edges(data='probability', default=0.0)
+
+    weight_ktn=ktn.graph['weight']
+    for origin, weight_node in ktn.nodes(data='weight'):
+        ktn.nodes[origin]['probability']=weight_node/weight_ktn
+        for end, transition_attributes in ktn[origin].items():
+            transition_attributes['probability']=transition_attributes['weight']/weight_node
+
+def symmetrize(ktn):
+
+    ktn.edges(data='symmetrized', default=False)
+
+    for origin, end, symmetrized in ktn.edges(data='symmetrized'):
+        if not symmetrized:
+            if not transition_in_ktn(ktn, end, origin):
+                add_transition(ktn, end, origin, weight=0.0)
+            weight = 0.5*(ktn[origin][end]['weight']+ktn[end][origin]['weight'])
+            ktn[origin][end]['weight']=weight
+            ktn[end][origin]['weight']=weight
+            ktn[origin][end]['symmetrized']=True
+            ktn[end][origin]['symmetrized']=True
+
+    update_weights(ktn)
+    update_probabilities(ktn)
+
+    ktn.graph['symmetrized']=True
 
 # Convert
 
@@ -162,16 +233,31 @@ def get_microstate_name_from_network(ktn, indices='all'):
 
     return np.array(ktn.index_to_name)
 
-def get_temperature_from_network(ktn, indices='all'):
-
-    from simtk.unit import kelvin
+def get_component_index_from_network(ktn, indices='all'):
 
     output = None
-    if 'temperature' in ktn.graph:
-        output = ktn.graph['temperature']
-        output = output.in_units_of(kelvin)
-    else:
-        output = None
+    n_components=get_n_components_from_network(ktn)
+    if n_components is not None:
+        return np.arange(n_components)
+
+def get_basin_index_from_network(ktn, indices='all'):
+
+    output = None
+    n_basins=get_n_basins_from_network(ktn)
+    if n_basins is not None:
+        return np.arange(n_basins)
+
+def get_symmetrized_from_network(ktn, indices='all'):
+
+    return ktn.graph['symmetrized']
+
+def get_weight_from_network(ktn, indices='all'):
+
+    return ktn.graph['weight']
+
+def get_temperature_from_network(ktn, indices='all'):
+
+    return ktn.graph['temperature']
 
 def get_time_step_from_network(ktn, indices='all'):
 
@@ -193,6 +279,26 @@ def get_n_microstates_from_network(ktn, indices='all'):
 def get_n_transitions_from_network(ktn, indices='all'):
 
     return ktn.number_of_edges()
+
+def get_n_components_from_network(ktn, indices='all'):
+
+    output = None
+
+    if ktn.graph['with_components']:
+        aux = np.unique(list(nx.get_node_attributes(net,'component').values()))
+        output = aux.shape[0]
+
+    return output
+
+def get_n_basins_from_network(ktn, indices='all'):
+
+    output = None
+
+    if ktn.graph['with_basins']:
+        aux = np.unique(list(nx.get_node_attributes(net,'basin').values()))
+        output = aux.shape[0]
+
+    return output
 
 def get_form_from_network(ktn, indices='all'):
 
