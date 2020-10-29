@@ -42,6 +42,7 @@ def new_empty_ktn(n_microstates=0, time_step=None, temperature=None):
     ktn.graph['temperature']=aux
 
     ktn.__setattr__('index_to_name',[])
+    ktn.__setattr__('index_to_origin_end',[])
 
     return ktn
 
@@ -88,8 +89,10 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
         transition_attributes['index']=index
         transition_attributes['weight']=weight
         ktn.add_edge(origin, end, **transition_attributes)
+        print(origin)
         ktn.nodes[origin]['weight']+=weight
         ktn.graph['weight']+=weight
+        ktn.index_to_origin_end.append([origin,end])
 
     else:
         ktn[origin][end]['weight']+=weight
@@ -167,11 +170,13 @@ def microstate_index_to_attribute(ktn, attr, microstate_index):
 
 microstate_index_to_attribute_vect = np.vectorize(microstate_index_to_attribute, excluded=[0,1])
 
-def transition_index_to_attribute(ktn, attr, transition_index)
+def transition_index_to_attribute(ktn, attr, transition_index):
 
-    
+    origin,end = ktn.index_to_origin_end[transition_index]
+    output = ktn.edges(attr)[origin,end]
+    return output
 
-transition_index_to_attribute_vect = np.vectorize(microstate_index_to_attribute, excluded=[0,1])
+transition_index_to_attribute_vect = np.vectorize(transition_index_to_attribute, excluded=[0,1])
 
 ## from microstate
 
@@ -221,7 +226,7 @@ def get_microstate_name_from_microstate(ktn, indices='all'):
     if indices is 'all':
         output = get_microstate_name_from_network(ktn)
     else:
-        output = np.take(ktn.index_to_name,indices, dtype=object)
+        output = np.take(ktn.index_to_name,indices)
 
     return output
 
@@ -317,11 +322,86 @@ def get_n_microstates_from_microstate(ktn, indices='all'):
 
 def get_index_from_transition(ktn, indices='all'):
 
-    return get_transition_index_from_microstate(ktn, indices='all')
+    return get_transition_index_from_transition(ktn, indices='all')
 
-def get_transition_index_from_transition(ktn, indices='all')
+def get_origin_index_from_transition(ktn, indices='all'):
 
+    return get_transition_origin_index_from_transition(ktn, indices='all')
 
+def get_end_index_from_transition(ktn, indices='all'):
+
+    return get_transition_end_index_from_transition(ktn, indices='all')
+
+def get_weight_from_transition(ktn, indices='all'):
+
+    return get_transition_weight_from_transition(ktn, indices='all')
+
+def get_probability_from_transition(ktn, indices='all'):
+
+    return get_transition_probability_from_transition(ktn, indices='all')
+
+def get_symmetrized_from_transition(ktn, indices='all'):
+
+    return get_transition_symmetrized_from_transition(ktn, indices='all')
+
+def get_transition_index_from_transition(ktn, indices='all'):
+
+    output = None
+
+    if indices is 'all':
+        n_transitions = get_n_transitions_from_network(ktn)
+        output=np.arange(n_transitions)
+    else:
+        output=indices
+
+    return output
+
+def get_transition_origin_index_from_transition(ktn, indices='all'):
+
+    output = None
+    if indices is 'all':
+        output = [ii[0] for ii in ktn.index_to_origin_end]
+    else:
+        output = [ktn.index_to_origin_end[ii][0] for ii in indices]
+    output = [ktn.nodes[ii]['index'] for ii in output]
+    return output
+
+def get_transition_end_index_from_transition(ktn, indices='all'):
+
+    output = None
+    if indices is 'all':
+        output = [ii[1] for ii in ktn.index_to_origin_end]
+    else:
+        output = [ktn.index_to_origin_end[ii][1] for ii in indices]
+    output = [ktn.nodes[ii]['index'] for ii in output]
+    return output
+
+def get_transition_weight_from_transition(ktn, indices='all'):
+
+    output = None
+    if indices is 'all':
+        output = np.array(list(nx.get_edge_attributes(ktn,'weight').values()))
+    else:
+        output = transition_index_to_attributes_vect(indices, 'weight')
+    return output
+
+def get_transition_probability_from_transition(ktn, indices='all'):
+
+    output = None
+    if indices is 'all':
+        output = np.array(list(nx.get_edge_attributes(ktn,'probability').values()))
+    else:
+        output = transition_index_to_attributes_vect(indices, 'probability')
+    return output
+
+def get_transition_symmetrized_from_transition(ktn, indices='all'):
+
+    output = None
+    if indices is 'all':
+        output = np.array(list(nx.get_edge_attributes(ktn,'symmetrized').values()))
+    else:
+        output = transition_index_to_attributes_vect(indices, 'symmetrized')
+    return output
 
 ## from network
 

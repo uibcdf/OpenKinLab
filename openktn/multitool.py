@@ -213,7 +213,7 @@ def info(ktn, target='network', indices=None, selection='all', output='dataframe
 
         elif target=='transition':
 
-            index, origen_index, end_index, weight, probability, symmetrized = get(ktn, target=target,
+            index, origin_index, end_index, weight, probability, symmetrized = get(ktn, target=target,
                     transition_index=True, origin_index=True, end_index=True,
                     transition_weight=True, transition_probability=True, symmetrized=True)
 
