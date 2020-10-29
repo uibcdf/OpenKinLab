@@ -17,15 +17,15 @@ info=["",""]
 
 # Multitool
 
-def new_empty_ktn(time_step=0.0*nanoseconds, temperature=0.0*kelvin):
+def new_empty_ktn(n_microstates=0, temperature=None, time_step=None):
 
-    raise NotImplementedError
+    return openktn_KineticTransitionNetwork(n_microstates=n_microstates, temperature=temperature, time_step=time_step)
 
 def add_microstate(ktn, name=None):
 
-    raise NotImplementedError
+    return ktn.add_microstate(name=name)
 
-def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=False):
+def add_transition(ktn, origin, end, weight=1.0, origin_index=False, end_index=False):
 
     raise NotImplementedError
 
@@ -149,15 +149,15 @@ def get_basin_index_from_network(ktn, indices='all'):
 
 def get_symmetrized_from_network(ktn, indices='all'):
 
-    raise NotImplementedError
+    return ktn.symmetrized
 
 def get_weight_from_network(ktn, indices='all'):
 
-    raise NotImplementedError
+    return ktn.weight
 
 def get_temperature_from_network(ktn, indices='all'):
 
-    raise NotImplementedError
+    return ktn.temperature
 
 def get_time_step_from_network(ktn, indices='all'):
 

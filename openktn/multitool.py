@@ -53,17 +53,17 @@ def get_form(ktn):
         except:
             raise NotImplementedError("This KTN's form has not been implemented yet")
 
-def kinetic_transition_network(form='networkx.DiGraph', temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
+def kinetic_transition_network(form='openktn.KineticTransitionNetwork', n_microstates=0, temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
 
-    tmp_ktn = dict_new_empty_ktn[form](temperature=temperature, time_step=time_step)
+    tmp_ktn = dict_new_empty_ktn[form](n_microstates=n_microstates, temperature=temperature, time_step=time_step)
 
     return tmp_ktn
 
-def add_microstate(ktn, name=None):
+def add_microstate(ktn, name=None, index=None):
 
     form = get_form(ktn)
 
-    return dict_add_microstate[form](ktn, name=name)
+    return dict_add_microstate[form](ktn, name=name, index=index)
 
 def add_transition(ktn, origin, end, weight=1.0, origin_index=False, end_index=False):
 
@@ -82,6 +82,14 @@ def transition_in_ktn(ktn, origin, end, origin_index=False, end_index=False):
     form = get_form(ktn)
 
     return dict_transition_in_ktn[form](ktn, origin, end, origin_index=False, end_index=False)
+
+def transitions_out(ktn, origin, with_name=False):
+
+    raise NotImplementedError
+
+def transitions_in(ktn, end, with_name=False):
+
+    raise NotImplementedError
 
 def update_weights(ktn):
 
@@ -178,11 +186,41 @@ def info(ktn, target='network', indices=None, selection='all', output='dataframe
 
         if target=='microstate':
 
-            raise NotImplementedError
+            if get(ktn, target='network', symmetrized=True):
+
+                index, name, weight, probability, degree, component_index, basin_index = get(ktn, target=target,
+                    microstate_index=True, microstate_name=True, weight=True, probability=True, degree=True,
+                    component_index=True, basin_index=True)
+
+                tmp_df = df({'index':index, 'name':name, 'weight':weight, 'probability':probability,
+                            'degree':degree, 'component_index':component_index, 'basin_index':basin_index})
+
+            else:
+
+                index, name, weight, probability, out_degree, in_degree, component_index, basin_index = get(ktn, target=target,
+                    microstate_index=True, microstate_name=True, weight=True, probability=True, out_degree=True, in_degree=True,
+                    component_index=True, basin_index=True)
+
+                tmp_df = df({'index':index, 'name':name, 'weight':weight, 'probability':probability,
+                    'out_degree':out_degree, 'in_degree':in_degree, 'component_index':component_index,
+                    'basin_index':basin_index})
+
+            n_components, n_basins = get(ktn, target='network', n_components=True, n_basins=True)
+            if n_components==0: tmp_df.drop(columns=['component_index'], inplace=True)
+            if n_basins==0: tmp_df.drop(columns=['basin_index'], inplace=True)
+
+            return tmp_df.style.hide_index()
 
         elif target=='transition':
 
-            raise NotImplementedError
+            index, origen_index, end_index, weight, probability, symmetrized = get(ktn, target=target,
+                    transition_index=True, origin_index=True, end_index=True,
+                    transition_weight=True, transition_probability=True, symmetrized=True)
+
+            tmp_df = df({'index':index, 'origin_index':origin_index, 'end_index':end_index, 'weight':weight,
+                'probability':probability, 'symmetrized':symmetrized})
+
+            return tmp_df.style.hide_index()
 
         elif target=='component':
 
@@ -202,8 +240,8 @@ def info(ktn, target='network', indices=None, selection='all', output='dataframe
                          'n_basins':n_basins, 'weight':weight, 'symmetrized':symmetrized,
                          'temperature':temperature, 'time_step':time_step}, index=[0])
 
-            if n_components==None: tmp_df.drop(columns=['n_components'], inplace=True)
-            if n_basins==None: tmp_df.drop(columns=['n_basins'], inplace=True)
+            if n_components==0: tmp_df.drop(columns=['n_components'], inplace=True)
+            if n_basins==0: tmp_df.drop(columns=['n_basins'], inplace=True)
 
             return tmp_df.style.hide_index()
 

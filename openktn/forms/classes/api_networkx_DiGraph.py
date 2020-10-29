@@ -18,7 +18,7 @@ info=["",""]
 
 # Multitool
 
-def new_empty_ktn(time_step=0.0*nanoseconds, temperature=0.0*kelvin):
+def new_empty_ktn(n_microstates=0, time_step=None, temperature=None):
 
     from networkx import set_node_attributes, set_edge_attributes
 
@@ -45,18 +45,28 @@ def new_empty_ktn(time_step=0.0*nanoseconds, temperature=0.0*kelvin):
 
     return ktn
 
-def add_microstate(ktn, name=None):
+def add_microstate(ktn, name=None, index=None):
 
-    index=ktn.number_of_nodes()
-    microstate_attributes['index']=index
+    n_nodes = ktn.number_of_nodes()
 
     if name is None:
-        name=index
+        if index is None:
+            microstate_attributes['index']=n_nodes
+            microstate_attributes['name']=n_nodes
+            ktn.add_node(n_nodes, **microstate_attributes)
+            ktn.index_to_name.append(n_nodes)
+        else:
+            for ii in range(n_nodes, index):
+                microstate_attributes['index']=ii
+                microstate_attributes['name']=ii
+                ktn.add_node(ii, **microstate_attributes)
+                ktn.index_to_name.append(ii)
+    else:
 
-    microstate_attributes['name']=name
-
-    ktn.add_node(name, **microstate_attributes)
-    ktn.index_to_name.append(name)
+        microstate_attributes['index']=n_nodes
+        microstate_attributes['name']=name
+        ktn.add_node(name, **microstate_attributes)
+        ktn.index_to_name.append(name)
 
 def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=False):
 
@@ -157,6 +167,12 @@ def microstate_index_to_attribute(ktn, attr, microstate_index):
 
 microstate_index_to_attribute_vect = np.vectorize(microstate_index_to_attribute, excluded=[0,1])
 
+def transition_index_to_attribute(ktn, attr, transition_index)
+
+    
+
+transition_index_to_attribute_vect = np.vectorize(microstate_index_to_attribute, excluded=[0,1])
+
 ## from microstate
 
 def get_index_from_microstate(ktn, indices='all'):
@@ -174,6 +190,18 @@ def get_weight_from_microstate(ktn, indices='all'):
 def get_probability_from_microstate(ktn, indices='all'):
 
     return get_microstate_probability_from_microstate(ktn, indices=indices)
+
+def get_degree_from_microstate(ktn, indices='all'):
+
+    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+
+def get_out_degree_from_microstate(ktn, indices='all'):
+
+    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+
+def get_in_degree_from_microstate(ktn, indices='all'):
+
+    return get_microstate_in_degree_from_microstate(ktn, indices=indices)
 
 def get_microstate_index_from_microstate(ktn, indices='all'):
 
@@ -193,7 +221,7 @@ def get_microstate_name_from_microstate(ktn, indices='all'):
     if indices is 'all':
         output = get_microstate_name_from_network(ktn)
     else:
-        output = np.take(ktn.index_to_name,indices)
+        output = np.take(ktn.index_to_name,indices, dtype=object)
 
     return output
 
@@ -216,14 +244,83 @@ def get_microstate_probability_from_microstate(ktn, indices='all'):
     output = None
 
     if indices is 'all':
-
         output = np.array(list(nx.get_node_attributes(ktn, 'probability').values()))
-
     else:
-
         output = microstate_index_to_attribute_vect(ktn, 'probability', indices)
 
     return output
+
+def get_microstate_degree_from_microstate(ktn, indices='all'):
+
+    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+
+def get_microstate_out_degree_from_microstate(ktn, indices='all'):
+
+    output = None
+
+    if indices is 'all':
+        names = get_microstate_name_from_network(ktn)
+        output = np.array(ktn.out_degree(names))[:,1]
+    else:
+        names = get_microstate_name_from_microstate(ktn, indices)
+        output = np.array(ktn.out_degree(names))[:,1]
+
+    return output
+
+def get_microstate_in_degree_from_microstate(ktn, indices='all'):
+
+    output = None
+
+    if indices is 'all':
+        names = get_microstate_name_from_network(ktn)
+        output = np.array(ktn.in_degree(names))[:,1]
+    else:
+        names = get_microstate_name_from_microstate(ktn, indices)
+        output = np.array(ktn.in_degree(names))[:,1]
+
+    return output
+
+def get_component_index_from_microstate(ktn, indices='all'):
+
+    output = None
+
+    if indices is 'all':
+        output = np.array(list(nx.get_node_attributes(ktn, 'component_index').values()))
+    else:
+        output = microstate_index_to_attribute_vect(ktn, 'component_index', indices)
+
+    return output
+
+def get_basin_index_from_microstate(ktn, indices='all'):
+
+    output = None
+
+    if indices is 'all':
+        output = np.array(list(nx.get_node_attributes(ktn, 'basin_index').values()))
+    else:
+        output = microstate_index_to_attribute_vect(ktn, 'basin_index', indices)
+
+    return output
+
+def get_n_microstates_from_microstate(ktn, indices='all'):
+
+    output = None
+
+    if indices is 'all':
+        output=get_n_microstates_from_network(ktn)
+    else:
+        output=indices.shape[0]
+
+    return output
+
+## from transition
+
+def get_index_from_transition(ktn, indices='all'):
+
+    return get_transition_index_from_microstate(ktn, indices='all')
+
+def get_transition_index_from_transition(ktn, indices='all')
+
 
 
 ## from network
@@ -235,7 +332,7 @@ def get_microstate_index_from_network(ktn, indices='all'):
 
 def get_microstate_name_from_network(ktn, indices='all'):
 
-    return np.array(ktn.index_to_name)
+    return np.array(ktn.index_to_name, dtype=object)
 
 def get_component_index_from_network(ktn, indices='all'):
 
@@ -253,7 +350,7 @@ def get_basin_index_from_network(ktn, indices='all'):
 
 def get_symmetrized_from_network(ktn, indices='all'):
 
-    return ktn.graph['symmetrized']
+    return False not in nx.get_edge_attributes(ktn, 'symmetrized').values()
 
 def get_weight_from_network(ktn, indices='all'):
 
@@ -286,22 +383,28 @@ def get_n_transitions_from_network(ktn, indices='all'):
 
 def get_n_components_from_network(ktn, indices='all'):
 
-    output = None
-
-    if ktn.graph['with_components']:
-        aux = np.unique(list(nx.get_node_attributes(net,'component').values()))
+    output=None
+    try:
+        aux = np.unique(get_component_index_from_microstate(ktn, indices='all'))
         output = aux.shape[0]
-
+    except:
+        aux = set(get_component_index_from_microstate(ktn, indices='all'))
+        output = len(aux)
+    if None in aux:
+        output -= 1
     return output
 
 def get_n_basins_from_network(ktn, indices='all'):
 
-    output = None
-
-    if ktn.graph['with_basins']:
-        aux = np.unique(list(nx.get_node_attributes(net,'basin').values()))
+    output=None
+    try:
+        aux = np.unique(get_basin_index_from_microstate(ktn, indices='all'))
         output = aux.shape[0]
-
+    except:
+        aux = set(get_basin_index_from_microstate(ktn, indices='all'))
+        output = len(aux)
+    if None in aux:
+        output -= 1
     return output
 
 def get_form_from_network(ktn, indices='all'):
