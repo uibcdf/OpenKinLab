@@ -17,17 +17,17 @@ info=["",""]
 
 # Multitool
 
-def new_empty_ktn(n_microstates=0, temperature=None, time_step=None):
+def new(n_microstates=0, temperature=None, time_step=None):
 
     return openktn_KineticTransitionNetwork(n_microstates=n_microstates, temperature=temperature, time_step=time_step)
 
-def add_microstate(ktn, name=None):
+def add_microstate(ktn, name=None, index=None):
 
-    return ktn.add_microstate(name=name)
+    return ktn.add_microstate(name=name, index=index)
 
 def add_transition(ktn, origin, end, weight=1.0, origin_index=False, end_index=False):
 
-    raise NotImplementedError
+    return ktn.add_transition(origin, end, weight=weight, origin_index=origin_index, end_index=end_index)
 
 def microstate_in_ktn(ktn, name):
 
@@ -77,12 +77,25 @@ def get_probability_from_microstate(ktn, indices='all'):
 
     return get_microstate_probability_from_microstate(ktn, indices=indices)
 
+def get_degree_from_microstate(ktn, indices='all'):
+
+    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+
+def get_out_degree_from_microstate(ktn, indices='all'):
+
+    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+
+def get_in_degree_from_microstate(ktn, indices='all'):
+
+    return get_microstate_in_degree_from_microstate(ktn, indices=indices)
+
 def get_microstate_index_from_microstate(ktn, indices='all'):
 
     output = None
 
     if indices is 'all':
-        output = get_microstate_index_from_network(ktn)
+        n_microstates = get_n_microstates_from_network(ktn)
+        output = np.arange(n_microstates)
     else:
         output = indices
 
@@ -93,9 +106,9 @@ def get_microstate_name_from_microstate(ktn, indices='all'):
     output = None
 
     if indices is 'all':
-        output = get_microstate_name_from_network(ktn)
+        output = ktn.microstates_dataframe['microstate_name'].to_numpy()
     else:
-        raise NotImplementedError
+        output = ktn.microstates_dataframe.loc[indices,'microstate_name'].to_numpy()
 
     return output
 
@@ -104,9 +117,9 @@ def get_microstate_weight_from_microstate(ktn, indices='all'):
     output = None
 
     if indices is 'all':
-        raise NotImplementedError
+        output = ktn.microstates_dataframe['microstate_weight'].to_numpy()
     else:
-        raise NotImplementedError
+        output = ktn.microstates_dataframe.loc[indices,'microstate_weight'].to_numpy()
 
     return output
 
@@ -115,12 +128,23 @@ def get_microstate_probability_from_microstate(ktn, indices='all'):
     output = None
 
     if indices is 'all':
-        raise NotImplementedError
+        output = ktn.microstates_dataframe['microstate_probability'].to_numpy()
     else:
-        raise NotImplementedError
+        output = ktn.microstates_dataframe.loc[indices,'microstate_probability'].to_numpy()
 
     return output
 
+def get_microstate_degree_from_microstate(ktn, indices='all'):
+
+    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+
+def get_microstate_out_degree_from_microstate(ktn, indices='all'):
+
+    raise NotImplementedError
+
+def get_microstate_in_degree_from_microstate(ktn, indices='all'):
+
+    raise NotImplementedError
 
 ## from network
 
@@ -149,7 +173,7 @@ def get_basin_index_from_network(ktn, indices='all'):
 
 def get_symmetrized_from_network(ktn, indices='all'):
 
-    return ktn.symmetrized
+    return False not in ktn.transitions_dataframe['symmetrized']
 
 def get_weight_from_network(ktn, indices='all'):
 

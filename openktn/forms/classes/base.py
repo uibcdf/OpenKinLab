@@ -15,7 +15,7 @@ dict_api_forms={}
 list_forms=[]
 
 dict_is_form={}
-dict_new_empty_ktn={}
+dict_new={}
 dict_add_microstate={}
 dict_add_transition={}
 dict_microstate_in_ktn={}
@@ -35,7 +35,7 @@ for api_form in list_api_forms:
 
 for form_name in list_forms:
 
-    dict_new_empty_ktn[form_name]= {}
+    dict_new[form_name]= {}
     dict_add_microstate[form_name]= {}
     dict_add_transition[form_name]= {}
     dict_microstate_in_ktn[form_name]= {}
@@ -61,8 +61,8 @@ for form_name in list_forms:
             option, target = method[4:].split('_from_')
             dict_get[form_name][target][option]=getattr(dict_api_forms[form_name], method)
 
-    if 'new_empty_ktn' in dict_api_forms[form_name].__dict__.keys():
-        dict_new_empty_ktn[form_name]=getattr(dict_api_forms[form_name],'new_empty_ktn')
+    if 'new' in dict_api_forms[form_name].__dict__.keys():
+        dict_new[form_name]=getattr(dict_api_forms[form_name],'new')
     if 'add_microstate' in dict_api_forms[form_name].__dict__.keys():
         dict_add_microstate[form_name]=getattr(dict_api_forms[form_name],'add_microstate')
     if 'add_transition' in dict_api_forms[form_name].__dict__.keys():

@@ -1,7 +1,7 @@
 import numpy as np
 from simtk.unit import kelvin, nanoseconds
 
-attributes = {'temperature':None, 'time_step':None, 'weight':0.0}
+attributes = {'temperature':None, 'time_step':None}
 
 class KineticTransitionNetwork():
 

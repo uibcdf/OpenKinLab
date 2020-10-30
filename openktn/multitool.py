@@ -6,7 +6,7 @@ from .utils.indices import intersection_indices
 # Classes
 
 from .forms.classes import dict_is_form as dict_classes_is_form, \
-        dict_new_empty_ktn as dict_classes_new_empty_ktn, \
+        dict_new as dict_classes_new, \
         dict_add_microstate as dict_classes_add_microstate, \
         dict_add_transition as dict_classes_add_transition, \
         dict_microstate_in_ktn as dict_classes_microstate_in_ktn, \
@@ -20,7 +20,7 @@ from .forms.classes import dict_is_form as dict_classes_is_form, \
 # Files
 
 from .forms.files import dict_is_form as dict_files_is_form, \
-        dict_new_empty_ktn as dict_files_new_empty_ktn, \
+        dict_new as dict_files_new, \
         dict_add_microstate as dict_files_add_microstate, \
         dict_add_transition as dict_files_add_transition, \
         dict_microstate_in_ktn as dict_files_microstate_in_ktn, \
@@ -32,7 +32,7 @@ from .forms.files import dict_is_form as dict_files_is_form, \
         dict_get as dict_files_get
 
 dict_is_form = {**dict_classes_is_form, **dict_files_is_form}
-dict_new_empty_ktn = {**dict_classes_new_empty_ktn, **dict_files_new_empty_ktn}
+dict_new = {**dict_classes_new, **dict_files_new}
 dict_add_microstate = {**dict_classes_add_microstate, **dict_files_add_microstate}
 dict_add_transition = {**dict_classes_add_transition, **dict_files_add_transition}
 dict_microstate_in_ktn = {**dict_classes_microstate_in_ktn, **dict_files_microstate_in_ktn}
@@ -55,7 +55,7 @@ def get_form(ktn):
 
 def kinetic_transition_network(form='openktn.KineticTransitionNetwork', n_microstates=0, temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
 
-    tmp_ktn = dict_new_empty_ktn[form](n_microstates=n_microstates, temperature=temperature, time_step=time_step)
+    tmp_ktn = dict_new[form](n_microstates=n_microstates, temperature=temperature, time_step=time_step)
 
     return tmp_ktn
 
@@ -71,13 +71,13 @@ def add_transition(ktn, origin, end, weight=1.0, origin_index=False, end_index=F
 
     return dict_add_transition[form](ktn, origin, end, weight=weight, origin_index=origin_index, end_index=end_index)
 
-def microstate_in_ktn(ktn, name):
+def microstate_in(ktn, name=None, index=None):
 
     form = get_form(ktn)
 
-    return dict_microstate_in_ktn[form](ktn, name)
+    return dict_microstate_in_ktn[form](ktn, name=name, index=index)
 
-def transition_in_ktn(ktn, origin, end, origin_index=False, end_index=False):
+def transition_in(ktn, origin, end, origin_index=False, end_index=False):
 
     form = get_form(ktn)
 
