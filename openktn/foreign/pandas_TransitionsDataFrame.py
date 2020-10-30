@@ -1,6 +1,6 @@
 from pandas import DataFrame as Pandas_DataFrame
 
-class Pandas_MicrostatesDataFrame(Pandas_DataFrame):
+class Pandas_TransitionsDataFrame(Pandas_DataFrame):
 
     def __init__(self):
 

@@ -16,9 +16,9 @@ info=["",""]
 
 # Multitool
 
-def new(n_microstates=0, time_step=None, temperature=None):
+def new(temperature=None, time_step=None):
 
-    ktn = pandas_TransitionsDataFrame()
+    ktn = pandas_KineticTransitionNetwork(temperature=temperature, time_step=time_step)
 
     return ktn
 

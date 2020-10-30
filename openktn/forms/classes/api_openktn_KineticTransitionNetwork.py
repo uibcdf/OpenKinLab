@@ -17,9 +17,9 @@ info=["",""]
 
 # Multitool
 
-def new(n_microstates=0, temperature=None, time_step=None):
+def new(temperature=None, time_step=None):
 
-    return openktn_KineticTransitionNetwork(n_microstates=n_microstates, temperature=temperature, time_step=time_step)
+    return openktn_KineticTransitionNetwork(temperature=temperature, time_step=time_step)
 
 def add_microstate(ktn, name=None, index=None):
 
@@ -29,11 +29,11 @@ def add_transition(ktn, origin, end, weight=1.0, origin_index=False, end_index=F
 
     return ktn.add_transition(origin, end, weight=weight, origin_index=origin_index, end_index=end_index)
 
-def microstate_in_ktn(ktn, name):
+def microstate_in(ktn, name):
 
     raise NotImplementedError
 
-def transition_in_ktn(ktn, origin, end, origin_index=False, end_index=False):
+def transition_in(ktn, origin, end, origin_index=False, end_index=False):
 
     raise NotImplementedError
 

@@ -32,7 +32,7 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
     if not end_index:
         raise NotImplementedError("This method does not apply for this KTN form.")
 
-    if not transition_in_ktn(ktn, origin, end, origin_index=origin_index, end_index=end_index):
+    if not transition_in(ktn, origin, end, origin_index=origin_index, end_index=end_index):
 
         n_transitions = ktn.shape[0]
 
@@ -106,17 +106,24 @@ def _transition_origin_end_to_index(ktn, indices):
 
 transition_origin_end_to_index = np.vectorize(_transition_origin_end_to_index, excluded=[0])
 
-def _microstate_out_degree_from_microstate(ktn, index)
+def _microstate_out_degree_from_microstate(ktn, index):
 
     return ktn['origin_index'].isin([index]).sum()
 
 _microstate_out_degree_from_microstate_vect = np.vectorize(_microstate_out_degree_from_microstate, excluded=[0])
 
-def _microstate_in_degree_from_microstate(ktn, index)
+def _microstate_in_degree_from_microstate(ktn, index):
 
     return ktn['end_index'].isin([index]).sum()
 
 _microstate_in_degree_from_microstate_vect = np.vectorize(_microstate_in_degree_from_microstate, excluded=[0])
+
+
+def _microstate_weight_from_microstate(ktn, index):
+
+    return ktn[ktn['end_index'].isin([index])]['weight'].sum()
+
+_microstate_weight_from_microstate_vect = np.vectorize(_microstate_weight_from_microstate, excluded=[0])
 
 
 ## from microstate
@@ -159,9 +166,26 @@ def get_microstate_name_from_microstate(ktn, indices='all'):
 
 def get_microstate_weight_from_microstate(ktn, indices='all'):
 
+    output = None
+
+    if indices is 'all':
+        raise NotImplementedError("This method does not apply for this KTN form.")
+    else:
+        output = _microstate_weight_from_microstate_vect(ktn,indices)
+
+    return output
 
 def get_microstate_probability_from_microstate(ktn, indices='all'):
 
+    output = None
+
+    if indices is 'all':
+        raise NotImplementedError("This method does not apply for this KTN form.")
+    else:
+        weight = get_weight_from_network(ktn)
+        output = _microstate_weight_from_microstate_vect(ktn,indices)/weight
+
+    return output
 
 def get_microstate_degree_from_microstate(ktn, indices='all'):
 

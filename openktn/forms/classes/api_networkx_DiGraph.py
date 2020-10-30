@@ -74,16 +74,16 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
     if origin_index:
         origin = get_microstate_name_from_microstate(ktn, indices=[origin])[0]
     else:
-        if not microstate_in_ktn(ktn, origin):
+        if not microstate_in(ktn, origin):
             add_microstate(ktn, origin)
 
     if end_index:
         end = get_microstate_name_from_microstate(ktn, indices=[end])[0]
     else:
-        if not microstate_in_ktn(ktn, end):
+        if not microstate_in(ktn, end):
             add_microstate(ktn, end)
 
-    if not transition_in_ktn(ktn, origin, end):
+    if not transition_in(ktn, origin, end):
 
         index = ktn.number_of_edges()
         transition_attributes['index']=index
@@ -99,11 +99,11 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
         ktn.nodes[origin]['weight']+=weight
         ktn.graph['weight']+=weight
 
-def microstate_in_ktn(ktn, name):
+def microstate_in(ktn, name):
 
     return (name in ktn.nodes)
 
-def transition_in_ktn(ktn, origin, end, origin_index=False, end_index=False):
+def transition_in(ktn, origin, end, origin_index=False, end_index=False):
 
     if origin_index:
         origin = get_microstate_name_from_microstate(ktn, indices=origin)
@@ -138,7 +138,7 @@ def symmetrize(ktn):
 
     for origin, end, symmetrized in ktn.edges(data='symmetrized'):
         if not symmetrized:
-            if not transition_in_ktn(ktn, end, origin):
+            if not transition_in(ktn, end, origin):
                 add_transition(ktn, end, origin, weight=0.0)
             weight = 0.5*(ktn[origin][end]['weight']+ktn[end][origin]['weight'])
             ktn[origin][end]['weight']=weight

@@ -18,8 +18,8 @@ dict_is_form={}
 dict_new={}
 dict_add_microstate={}
 dict_add_transition={}
-dict_microstate_in_ktn={}
-dict_transition_in_ktn={}
+dict_microstate_in={}
+dict_transition_in={}
 dict_update_weights={}
 dict_update_probabilities={}
 dict_symmetrize={}
@@ -38,8 +38,8 @@ for form_name in list_forms:
     dict_new[form_name]= {}
     dict_add_microstate[form_name]= {}
     dict_add_transition[form_name]= {}
-    dict_microstate_in_ktn[form_name]= {}
-    dict_transition_in_ktn[form_name]= {}
+    dict_microstate_in[form_name]= {}
+    dict_transition_in[form_name]= {}
     dict_update_weights[form_name]= {}
     dict_update_probabilities[form_name]= {}
     dict_select[form_name]= {}
@@ -67,10 +67,10 @@ for form_name in list_forms:
         dict_add_microstate[form_name]=getattr(dict_api_forms[form_name],'add_microstate')
     if 'add_transition' in dict_api_forms[form_name].__dict__.keys():
         dict_add_transition[form_name]=getattr(dict_api_forms[form_name],'add_transition')
-    if 'microstate_in_ktn' in dict_api_forms[form_name].__dict__.keys():
-        dict_microstate_in_ktn[form_name]=getattr(dict_api_forms[form_name],'microstate_in_ktn')
-    if 'transition_in_ktn' in dict_api_forms[form_name].__dict__.keys():
-        dict_transition_in_ktn[form_name]=getattr(dict_api_forms[form_name],'transition_in_ktn')
+    if 'microstate_in' in dict_api_forms[form_name].__dict__.keys():
+        dict_microstate_in[form_name]=getattr(dict_api_forms[form_name],'microstate_in')
+    if 'transition_in' in dict_api_forms[form_name].__dict__.keys():
+        dict_transition_in[form_name]=getattr(dict_api_forms[form_name],'transition_in')
     if 'update_weights' in dict_api_forms[form_name].__dict__.keys():
         dict_update_weights[form_name]=getattr(dict_api_forms[form_name],'update_weights')
     if 'update_probabilities' in dict_api_forms[form_name].__dict__.keys():
