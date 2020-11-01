@@ -37,15 +37,16 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
         n_transitions = ktn.shape[0]
 
         ktn.at[n_transitions, 'index']=n_transitions
-        ktn.at[n_transitions, 'origin']=origin
-        ktn.at[n_transitions, 'end']=end
-        ktn.at[n_transitions, 'weight']+=weight
+        ktn.at[n_transitions, 'origin_index']=origin
+        ktn.at[n_transitions, 'end_index']=end
+        ktn.at[n_transitions, 'weight']=weight
         ktn.at[n_transitions, 'probability']=0.0
+        ktn.at[n_transitions, 'symmetrized']=False
 
     else:
 
-        index = transition_origen_end_to_index(ktn,[origin,end])
-        ktn.loc[index,'weight']+=weight
+        index = transition_origin_end_to_index(ktn,[origin],[end])[0]
+        ktn.at[index,'weight']+=weight
 
 def microstate_in(ktn, name):
 
@@ -59,7 +60,10 @@ def transition_in(ktn, origin, end, origin_index=False, end_index=False):
     if not end_index:
         raise NotImplementedError("This method does not apply for this KTN form.")
 
-    return (ktn['origin_index']==origin & ktn['end_index']==end).any()
+    if ktn.shape[0]==0:
+        return False
+    else:
+        return (ktn['origin_index'].isin([origin]) & ktn['end_index'].isin([end])).any()
 
 def update_weights(ktn):
 
@@ -84,7 +88,7 @@ def symmetrize(ktn):
                 weight=0.5*ktn.at[index,'weight']
                 ktn.at[index,'weight']=weight
                 back_index=ktn.shape[0]
-                add_transition(ktn, end, origin, weight=weight, origin_index=True, end_index=True)
+                add_transition(ktn, back_index, index, weight=weight, origin_index=True, end_index=True)
             ktn.at[index,'symmetrized']=True
             ktn.at[back_index,'symmetrized']=True
 
@@ -100,9 +104,9 @@ def select(ktn, selection):
 
 ## Aux
 
-def _transition_origin_end_to_index(ktn, indices):
+def _transition_origin_end_to_index(ktn, origin, end):
 
-    return ktn[ktn['origin_index']==indices[0] & ktn['end_index']==indices[1]].index[0]
+    return ktn.loc[(ktn['origin_index']==origin) & (ktn['end_index']==end)].index[0]
 
 transition_origin_end_to_index = np.vectorize(_transition_origin_end_to_index, excluded=[0])
 
@@ -326,7 +330,7 @@ def get_basin_index_from_network(ktn, indices='all'):
 
 def get_symmetrized_from_network(ktn, indices='all'):
 
-    return ktn['symmetrized'].isin([False]).any()
+    return ktn['symmetrized'].isin([True]).all()
 
 def get_weight_from_network(ktn, indices='all'):
 

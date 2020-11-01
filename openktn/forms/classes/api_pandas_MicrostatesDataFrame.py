@@ -27,19 +27,26 @@ def add_microstate(ktn, name=None, index=None):
 
     n_microstates=ktn.shape[0]
 
-    if index is None:
+    if name is not None:
+        if index is not None:
+            ktn.at[index, 'index']=index
+            ktn.at[index, 'name']=name
+            ktn.at[index, 'weight']=0.0
+            ktn.at[index, 'probability']=0.0
+        else:
+            ktn.at[n_microstates, 'index']=n_microstates
+            ktn.at[n_microstates, 'name']=name
+            ktn.at[n_microstates, 'weight']=0.0
+            ktn.at[n_microstates, 'probability']=0.0
+    elif index is None:
         ktn.at[n_microstates, 'index']=n_microstates
-        ktn.at[n_microstates, 'name']=name
+        ktn.at[n_microstates, 'name']=n_microstates
         ktn.at[n_microstates, 'weight']=0.0
         ktn.at[n_microstates, 'probability']=0.0
-    elif name is not None:
-        ktn.at[index, 'index']=index
-        ktn.at[index, 'name']=name
-        ktn.at[index, 'weight']=0.0
-        ktn.at[index, 'probability']=0.0
     else:
         for ii in range(n_microstates, index+1):
             ktn.at[ii, 'index']=ii
+            ktn.at[ii, 'name']=ii
             ktn.at[ii, 'weight']=0.0
             ktn.at[ii, 'probability']=0.0
 
@@ -49,7 +56,9 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
 
 def microstate_in(ktn, name=None, index=None):
 
-    if name is not None:
+    if ktn.shape[0]==0:
+        return False
+    elif name is not None:
         output = ktn['name'].isin([name]).any()
     elif index is not None:
         output = ktn['index'].isin([index]).any()
@@ -68,7 +77,7 @@ def update_weights(ktn):
 
 def update_probabilities(ktn):
 
-    weight = get_network_weight_from_network(ktn)
+    weight = get_weight_from_network(ktn)
     if weight:
         ktn['probability']=ktn['weight']/weight
 

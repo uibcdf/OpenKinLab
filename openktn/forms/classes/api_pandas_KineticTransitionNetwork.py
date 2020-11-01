@@ -34,15 +34,14 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
     else:
         if not microstate_in(ktn, name=origin):
             add_microstate(ktn, name=origin)
-        origin=api_microstates.microstate_name_to_index(ktn.microstates, origin)
-
+        origin=api_microstates.microstate_name_to_index(ktn.microstates, [origin])[0]
     if end_index:
         if not microstate_in(ktn, index=end):
             add_microstate(ktn, index=end)
     else:
         if not microstate_in(ktn, name=end):
             add_microstate(ktn, name=end)
-        end=api_microstates.microstate_name_to_index(ktn.microstates, end)
+        end=api_microstates.microstate_name_to_index(ktn.microstates, [end])[0]
 
     api_transitions.add_transition(ktn.transitions, origin, end, weight=weight, origin_index=True, end_index=True)
 
@@ -77,7 +76,7 @@ def update_weights(ktn):
 
     ktn.microstates['weight']=0.0
 
-    aux = ktn.transitions.groupby(by='origen_index')['weight'].sum()
+    aux = ktn.transitions.groupby(by='origin_index')['weight'].sum()
     for index, weight in aux.items():
         ktn.microstates.at[index, 'weight']=weight
 

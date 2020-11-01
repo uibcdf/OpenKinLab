@@ -1,9 +1,7 @@
 from os.path import basename as _basename
 from openktn.native import KineticTransitionNetwork as openktn_KineticTransitionNetwork
+from openktn.forms.classes import api_pandas_KineticTransitionNetwork as api
 from simtk.unit import kelvin, nanoseconds
-from openktn.native.network import attributes as network_attributes
-from openktn.native.microstate import attributes as microstate_attributes
-from openktn.native.transition import attributes as transition_attributes
 import numpy as np
 
 form_name=_basename(__file__).split('.')[0].replace('api_','').replace('_','.')
@@ -19,35 +17,38 @@ info=["",""]
 
 def new(temperature=None, time_step=None):
 
-    return openktn_KineticTransitionNetwork(temperature=temperature, time_step=time_step)
+    ktn = openktn_KineticTransitionNetwork(temperature=temperature, time_step=time_step)
+
+    return ktn
 
 def add_microstate(ktn, name=None, index=None):
 
-    return ktn.add_microstate(name=name, index=index)
+    return api.add_microstate(ktn, name=name, index=index)
 
-def add_transition(ktn, origin, end, weight=1.0, origin_index=False, end_index=False):
+def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=False):
 
-    return ktn.add_transition(origin, end, weight=weight, origin_index=origin_index, end_index=end_index)
+    return api.add_transition(ktn, origin, end, weight=weight, origin_index=origin_index,
+                              end_index=end_index)
 
-def microstate_in(ktn, name):
+def microstate_in(ktn, name=None, index=None):
 
-    raise NotImplementedError
+    return api.microstate_in(ktn, name=name, index=index)
 
 def transition_in(ktn, origin, end, origin_index=False, end_index=False):
 
-    raise NotImplementedError
+    return api.transition_in(ktn, origin, end, origin_index=origin_index, end_index=end_index)
 
 def update_weights(ktn):
 
-    raise NotImplementedError
+    return api.update_weights(ktn)
 
 def update_probabilities(ktn):
 
-    raise NotImplementedError
+    return api.update_probabilities(ktn)
 
 def symmetrize(ktn):
 
-    raise NotImplementedError
+    return api.update_symmetrize(ktn)
 
 def select(ktn, selection):
 
@@ -63,145 +64,171 @@ def select(ktn, selection):
 
 def get_index_from_microstate(ktn, indices='all'):
 
-    return get_microstate_index_from_microstate(ktn, indices=indices)
+    return api.get_index_from_microstate(ktn, indices=indices)
 
 def get_name_from_microstate(ktn, indices='all'):
 
-    return get_microstate_name_from_microstate(ktn, indices=indices)
+    return api.get_name_from_microstate(ktn, indices=indices)
 
 def get_weight_from_microstate(ktn, indices='all'):
 
-    return get_microstate_weight_from_microstate(ktn, indices=indices)
+    return api.get_weight_from_microstate(ktn, indices=indices)
 
 def get_probability_from_microstate(ktn, indices='all'):
 
-    return get_microstate_probability_from_microstate(ktn, indices=indices)
+    return api.get_probability_from_microstate(ktn, indices=indices)
 
 def get_degree_from_microstate(ktn, indices='all'):
 
-    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+    return api.get_degree_from_microstate(ktn, indices=indices)
 
 def get_out_degree_from_microstate(ktn, indices='all'):
 
-    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+    return api.get_out_degree_from_microstate(ktn, indices=indices)
 
 def get_in_degree_from_microstate(ktn, indices='all'):
 
-    return get_microstate_in_degree_from_microstate(ktn, indices=indices)
+    return api.get_in_degree_from_microstate(ktn, indices=indices)
 
 def get_microstate_index_from_microstate(ktn, indices='all'):
 
-    output = None
-
-    if indices is 'all':
-        n_microstates = get_n_microstates_from_network(ktn)
-        output = np.arange(n_microstates)
-    else:
-        output = indices
-
-    return output
+    return api.get_microstate_index_from_microstate(ktn, indices=indices)
 
 def get_microstate_name_from_microstate(ktn, indices='all'):
 
-    output = None
-
-    if indices is 'all':
-        output = ktn.microstates_dataframe['microstate_name'].to_numpy()
-    else:
-        output = ktn.microstates_dataframe.loc[indices,'microstate_name'].to_numpy()
-
-    return output
+    return api.get_microstate_name_from_microstate(ktn, indices=indices)
 
 def get_microstate_weight_from_microstate(ktn, indices='all'):
 
-    output = None
-
-    if indices is 'all':
-        output = ktn.microstates_dataframe['microstate_weight'].to_numpy()
-    else:
-        output = ktn.microstates_dataframe.loc[indices,'microstate_weight'].to_numpy()
-
-    return output
+    return api.get_microstate_weight_from_microstate(ktn, indices=indices)
 
 def get_microstate_probability_from_microstate(ktn, indices='all'):
 
-    output = None
-
-    if indices is 'all':
-        output = ktn.microstates_dataframe['microstate_probability'].to_numpy()
-    else:
-        output = ktn.microstates_dataframe.loc[indices,'microstate_probability'].to_numpy()
-
-    return output
+    return api.get_microstate_probability_from_microstate(ktn, indices=indices)
 
 def get_microstate_degree_from_microstate(ktn, indices='all'):
 
-    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+    return api.get_microstate_degree_from_microstate(ktn, indices=indices)
 
 def get_microstate_out_degree_from_microstate(ktn, indices='all'):
 
-    raise NotImplementedError
+    return api.get_microstate_out_degree_from_microstate(ktn, indices=indices)
 
 def get_microstate_in_degree_from_microstate(ktn, indices='all'):
 
-    raise NotImplementedError
+    return api.get_microstate_in_degree_from_microstate(ktn, indices=indices)
+
+def get_component_index_from_microstate(ktn, indices='all'):
+
+    return api.get_component_index_from_microstate(ktn, indices=indices)
+
+def get_basin_index_from_microstate(ktn, indices='all'):
+
+    return api.get_basin_index_from_microstate(ktn, indices=indices)
+
+def get_n_microstates_from_microstate(ktn, indices='all'):
+
+    return api.get_n_microstates_from_microstate(ktn, indices=indices)
+
+## from transition
+
+def get_index_from_transition(ktn, indices='all'):
+
+    return api.get_index_from_transition(ktn, indices=indices)
+
+def get_origin_index_from_transition(ktn, indices='all'):
+
+    return api.get_origin_index_from_transition(ktn, indices=indices)
+
+def get_end_index_from_transition(ktn, indices='all'):
+
+    return api.get_end_index_from_transition(ktn, indices=indices)
+
+def get_weight_from_transition(ktn, indices='all'):
+
+    return api.get_weight_from_transition(ktn, indices=indices)
+
+def get_probability_from_transition(ktn, indices='all'):
+
+    return api.get_probability_from_transition(ktn, indices=indices)
+
+def get_symmetrized_from_transition(ktn, indices='all'):
+
+    return api.get_symmetrized_from_transition(ktn, indices=indices)
+
+def get_transition_index_from_transition(ktn, indices='all'):
+
+    return api.get_transition_index_from_transition(ktn, indices=indices)
+
+def get_transition_origin_index_from_transition(ktn, indices='all'):
+
+    return api.get_transition_origin_index_from_transition(ktn, indices=indices)
+
+def get_transition_end_index_from_transition(ktn, indices='all'):
+
+    return api.get_transition_end_index_from_transition(ktn, indices=indices)
+
+def get_transition_weight_from_transition(ktn, indices='all'):
+
+    return api.get_transition_weight_index_from_transition(ktn, indices=indices)
+
+def get_transition_probability_from_transition(ktn, indices='all'):
+
+    return api.get_transition_probability_index_from_transition(ktn, indices=indices)
+
+def get_transition_symmetrized_from_transition(ktn, indices='all'):
+
+    return api.get_transition_symmetrized_index_from_transition(ktn, indices=indices)
 
 ## from network
 
 def get_microstate_index_from_network(ktn, indices='all'):
 
-    n_microstates=get_n_microstates_from_network(ktn)
-    return np.arange(n_microstates)
+    return api.get_microstate_index_from_network(ktn, indices=indices)
 
 def get_microstate_name_from_network(ktn, indices='all'):
 
-    raise NotImplementedError
+    return api.get_microstate_name_from_network(ktn, indices=indices)
 
 def get_component_index_from_network(ktn, indices='all'):
 
-    output = None
-    n_components=get_n_components_from_network(ktn)
-    if n_components is not None:
-        return np.arange(n_components)
+    return api.get_component_index_from_network(ktn, indices=indices)
 
 def get_basin_index_from_network(ktn, indices='all'):
 
-    output = None
-    n_basins=get_n_basins_from_network(ktn)
-    if n_basins is not None:
-        return np.arange(n_basins)
+    return api.get_basin_index_from_network(ktn, indices=indices)
 
 def get_symmetrized_from_network(ktn, indices='all'):
 
-    return False not in ktn.transitions_dataframe['symmetrized']
+    return api.get_symmetrized_from_network(ktn, indices=indices)
 
 def get_weight_from_network(ktn, indices='all'):
 
-    return ktn.weight
+    return api.get_weight_from_network(ktn, indices=indices)
 
 def get_temperature_from_network(ktn, indices='all'):
 
-    return ktn.temperature
+    return api.get_temperature_from_network(ktn, indices=indices)
 
 def get_time_step_from_network(ktn, indices='all'):
 
-    return ktn.time_step
+    return api.get_time_step_from_network(ktn, indices=indices)
 
 def get_n_microstates_from_network(ktn, indices='all'):
 
-    return ktn.n_microstates()
+    return api.get_n_microstates_from_network(ktn, indices=indices)
 
 def get_n_transitions_from_network(ktn, indices='all'):
 
-    return ktn.n_transitions()
+    return api.get_n_transitions_from_network(ktn, indices=indices)
 
 def get_n_components_from_network(ktn, indices='all'):
 
-    return ktn.n_components()
+    return api.get_n_components_from_network(ktn, indices=indices)
 
 def get_n_basins_from_network(ktn, indices='all'):
 
-    return ktn.n_basins()
+    return api.get_n_basins_from_network(ktn, indices=indices)
 
 def get_form_from_network(ktn, indices='all'):
 

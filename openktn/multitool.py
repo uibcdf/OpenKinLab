@@ -55,7 +55,7 @@ def get_form(ktn):
 
 def kinetic_transition_network(form='openktn.KineticTransitionNetwork', n_microstates=0, temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
 
-    tmp_ktn = dict_new[form](n_microstates=n_microstates, temperature=temperature, time_step=time_step)
+    tmp_ktn = dict_new[form](temperature=temperature, time_step=time_step)
 
     return tmp_ktn
 

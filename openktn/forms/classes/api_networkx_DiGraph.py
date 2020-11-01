@@ -90,14 +90,12 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
         transition_attributes['weight']=weight
         ktn.add_edge(origin, end, **transition_attributes)
         ktn.nodes[origin]['weight']+=weight
-        ktn.graph['weight']+=weight
         ktn.index_to_origin_end.append([origin,end])
 
     else:
 
         ktn[origin][end]['weight']+=weight
         ktn.nodes[origin]['weight']+=weight
-        ktn.graph['weight']+=weight
 
 def microstate_in(ktn, name):
 
@@ -115,18 +113,16 @@ def transition_in(ktn, origin, end, origin_index=False, end_index=False):
 
 def update_weights(ktn):
 
-    ktn.graph['weight']=0.0
     nx.set_node_attributes(ktn, 0.0, 'weight')
     for origin, end, weight in ktn.edges(data='weight'):
         ktn.nodes[origin]['weight']+=weight
-        ktn.graph['weight']+=weight
 
 def update_probabilities(ktn):
 
     nx.set_node_attributes(ktn, 0.0, 'probability')
     nx.set_edge_attributes(ktn, 0.0, 'probability')
 
-    weight_ktn=ktn.graph['weight']
+    weight_ktn=get_weight_from_network(ktn)
     for origin, weight_node in ktn.nodes(data='weight'):
         ktn.nodes[origin]['probability']=weight_node/weight_ktn
         for end, transition_attributes in ktn[origin].items():
@@ -148,8 +144,6 @@ def symmetrize(ktn):
 
     update_weights(ktn)
     update_probabilities(ktn)
-
-    ktn.graph['symmetrized']=True
 
 def select(ktn, selection):
 
@@ -433,7 +427,7 @@ def get_symmetrized_from_network(ktn, indices='all'):
 
 def get_weight_from_network(ktn, indices='all'):
 
-    return ktn.graph['weight']
+    return sum(nx.get_edge_attributes(ktn, 'weight').values())
 
 def get_temperature_from_network(ktn, indices='all'):
 
