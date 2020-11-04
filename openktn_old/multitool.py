@@ -1,6 +1,7 @@
 import numpy as np
 import simtk.unit as unit
-#from .utils.targets import to_singular as singular_target
+from .utils.targets import to_singular as singular_target
+from .utils.indices import intersection_indices
 
 # Classes
 
@@ -8,24 +9,57 @@ from .forms.classes import dict_is_form as dict_classes_is_form, \
         dict_new as dict_classes_new, \
         dict_add_microstate as dict_classes_add_microstate, \
         dict_add_transition as dict_classes_add_transition, \
+        dict_remove_microstate as dict_classes_remove_microstate, \
+        dict_remove_transition as dict_classes_remove_transition, \
+        dict_microstate_is_in as dict_classes_microstate_is_in, \
+        dict_transition_is_in as dict_classes_transition_is_in, \
         dict_update_weights as dict_classes_update_weights, \
         dict_update_probabilities as dict_classes_update_probabilities, \
+        dict_symmetrize as dict_classes_symmetrize, \
         dict_select as dict_classes_select, \
         dict_get as dict_classes_get, \
-        dict_extract as dict_classes_extract, \
-        dict_merge as dict_classes_merge
+        dict_microstate_name_to_index as dict_classes_microstate_name_to_index, \
+        dict_transition_index as dict_classes_transition_index, \
+        dict_transitions_in as dict_classes_transitions_in, \
+        dict_transitions_out as dict_classes_transitions_out
 
+# Files
 
-dict_is_form = {**dict_classes_is_form}
-dict_new = {**dict_classes_new}
-dict_add_microstate = {**dict_classes_add_microstate}
-dict_add_transition = {**dict_classes_add_transition}
-dict_update_weights = {**dict_classes_update_weights}
-dict_update_probabilities = {**dict_classes_update_probabilities}
-dict_select = {**dict_classes_select}
-dict_get = {**dict_classes_get}
-dict_extract = {**dict_classes_extract}
-dict_merge = {**dict_classes_merge}
+from .forms.files import dict_is_form as dict_files_is_form, \
+        dict_new as dict_files_new, \
+        dict_add_microstate as dict_files_add_microstate, \
+        dict_add_transition as dict_files_add_transition, \
+        dict_remove_microstate as dict_files_remove_microstate, \
+        dict_remove_transition as dict_files_remove_transition, \
+        dict_microstate_is_in as dict_files_microstate_is_in, \
+        dict_transition_is_in as dict_files_transition_is_in, \
+        dict_update_weights as dict_files_update_weights, \
+        dict_update_probabilities as dict_files_update_probabilities, \
+        dict_symmetrize as dict_files_symmetrize, \
+        dict_select as dict_files_select, \
+        dict_get as dict_files_get, \
+        dict_microstate_name_to_index as dict_files_microstate_name_to_index, \
+        dict_transition_index as dict_files_transition_index, \
+        dict_transitions_in as dict_files_transitions_in, \
+        dict_transitions_out as dict_files_transitions_out
+
+dict_is_form = {**dict_classes_is_form, **dict_files_is_form}
+dict_new = {**dict_classes_new, **dict_files_new}
+dict_add_microstate = {**dict_classes_add_microstate, **dict_files_add_microstate}
+dict_add_transition = {**dict_classes_add_transition, **dict_files_add_transition}
+dict_remove_microstate = {**dict_classes_remove_microstate, **dict_files_remove_microstate}
+dict_remove_transition = {**dict_classes_remove_transition, **dict_files_remove_transition}
+dict_microstate_is_in = {**dict_classes_microstate_is_in, **dict_files_microstate_is_in}
+dict_transition_is_in = {**dict_classes_transition_is_in, **dict_files_transition_is_in}
+dict_update_weights = {**dict_classes_update_weights, **dict_files_update_weights}
+dict_update_probabilities = {**dict_classes_update_probabilities, **dict_files_update_probabilities}
+dict_symmetrize = {**dict_classes_symmetrize, **dict_files_symmetrize}
+dict_select = {**dict_classes_select, **dict_files_select}
+dict_get = {**dict_classes_get, **dict_files_get}
+dict_microstate_name_to_index = {**dict_classes_microstate_name_to_index, **dict_files_microstate_name_to_index}
+dict_transition_index = {**dict_classes_transition_index, **dict_files_transition_index}
+dict_transitions_out = {**dict_classes_transitions_out, **dict_files_transitions_out}
+dict_transitions_in = {**dict_classes_transitions_in, **dict_files_transitions_in}
 
 def get_form(ktn):
 
@@ -37,9 +71,10 @@ def get_form(ktn):
         except:
             raise NotImplementedError("This KTN's form has not been implemented yet")
 
-def kinetic_transition_network(form=None, temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
+def kinetic_transition_network(form='openktn.KineticTransitionNetwork', temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
 
     tmp_ktn = dict_new[form](temperature=temperature, time_step=time_step)
+
     return tmp_ktn
 
 def add_microstate(ktn, name=None):
@@ -48,11 +83,41 @@ def add_microstate(ktn, name=None):
 
     return dict_add_microstate[form](ktn, name=name)
 
-def add_transition(ktn, origin, end, weight=1.0):
+def remove_microstate(ktn, selection=None):
+
+    form = get_form(ktn)
+
+    return dict_remove_microstate[form](ktn, name=None)
+
+def add_transition(ktn, origin, end, weight=1.0, origin_index=False):
 
     form = get_form(ktn)
 
     return dict_add_transition[form](ktn, origin, end, weight=weight)
+
+def microstate_is_in(ktn, name):
+
+    form = get_form(ktn)
+
+    return dict_microstate_is_in[form](ktn, name)
+
+def transition_is_in(ktn, origin, end):
+
+    form = get_form(ktn)
+
+    return dict_transition_is_in[form](ktn, origin, end)
+
+def transitions_out(ktn, name):
+
+    form = get_form(ktn)
+
+    return dict_transitions_out[form](ktn, name=name)
+
+def transitions_in(ktn, name):
+
+    form = get_form(ktn)
+
+    return dict_transitions_in[form](ktn, name=name, index=index, output_names=output_names)
 
 def update_weights(ktn):
 
@@ -132,6 +197,12 @@ def get(ktn, target='microstate', selection='all', **kwargs):
         return results[0]
     else:
         return results
+
+def symmetrize(ktn):
+
+    form = get_form(ktn)
+
+    return dict_symmetrize[form](ktn)
 
 def info(ktn, target='network', selection='all', output='dataframe'):
 

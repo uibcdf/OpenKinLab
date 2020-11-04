@@ -18,22 +18,20 @@ def most_likely(ktn, target='microstate', selection='all', top=1, output_names=F
 
         indices = select(ktn, target='microstate', selection=selection)
 
-        if form=='networkx.DiGraph':
+        probabilities = get(ktn, target='microstate', indices=indices, probability=True)
+        aux=np.argsort(probabilities)[-top:][::-1]
+        output_elements = np.take(indices, aux)
+        output_values = np.take(probabilities, aux)
+        if output_names:
+            output_elements = get(ktn, target='microstate', indices=output_elements, name=True)
+        if output_free_energies:
+            temperature = get(ktn, target='network', temperature=True)
+            output_values = probability_to_free_energy(output_values, temperature)
 
-            probabilities = get(ktn, target='microstate', indices=indices, probability=True)
-            aux=np.argsort(probabilities)[-top:][::-1]
-            output_elements = np.take(indices, aux)
-            output_values = np.take(probabilities, aux)
-            if output_names:
-                output_elements = get(ktn, target='microstate', indices=output_elements, name=True)
-            if output_free_energies:
-                output_values = probability_to_free_energy(output_values, ktn.graph['temperature'])
-
-        else:
-
-            raise NotImplementedError
 
     return output_elements, output_values
+
+
 
 def global_minimum(ktn, selection='all', output_names=False, output_free_energies=False):
 

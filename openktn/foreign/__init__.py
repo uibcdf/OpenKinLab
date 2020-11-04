@@ -1,3 +1,1 @@
-from .pandas_MicrostatesDataFrame import Pandas_MicrostatesDataFrame
-from .pandas_TransitionsDataFrame import Pandas_TransitionsDataFrame
 from .pandas_KineticTransitionNetwork import Pandas_KineticTransitionNetwork

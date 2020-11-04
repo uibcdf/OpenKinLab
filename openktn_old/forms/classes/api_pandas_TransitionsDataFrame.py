@@ -14,25 +14,19 @@ info=["",""]
 
 # Multitool
 
-def new(n_microstates=0, time_step=None, temperature=None):
+def new(time_step=None, temperature=None):
 
     ktn = pandas_TransitionsDataFrame()
 
     return ktn
 
-def add_microstate(ktn, name=None, index=None):
+def add_microstate(ktn, name=None):
 
     raise NotImplementedError("This method does not apply for this KTN form.")
 
-def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=False):
+def add_transition(ktn, origin, end, weight=0.0):
 
-    if not origin_index:
-        raise NotImplementedError("This method does not apply for this KTN form.")
-
-    if not end_index:
-        raise NotImplementedError("This method does not apply for this KTN form.")
-
-    if not transition_in(ktn, origin, end, origin_index=origin_index, end_index=end_index):
+    if not transition_is_in(ktn, origin, end):
 
         n_transitions = ktn.shape[0]
 
@@ -45,20 +39,14 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
 
     else:
 
-        index = transition_origin_end_to_index(ktn,[origin],[end])[0]
+        index = transition_origin_end_to_index(ktn,origin,end)
         ktn.at[index,'weight']+=weight
 
-def microstate_in(ktn, name):
+def microstate_is_in(ktn, name):
 
     raise NotImplementedError("This method does not apply for this KTN form.")
 
-def transition_in(ktn, origin, end, origin_index=False, end_index=False):
-
-    if not origin_index:
-        raise NotImplementedError("This method does not apply for this KTN form.")
-
-    if not end_index:
-        raise NotImplementedError("This method does not apply for this KTN form.")
+def transition_is_in(ktn, origin, end):
 
     if ktn.shape[0]==0:
         return False
@@ -79,16 +67,18 @@ def symmetrize(ktn):
 
     for index in range(ktn.shape[0]):
         if not ktn.at[index,'symmetrized']:
-            try:
-                back_index = transition_origin_end_to_index(ktn, [end,origin])
+            origin = ktn.at[index,'origin_index']
+            end = ktn.at[index,'end_index']
+            if transition_is_in(ktn, end, origin):
+                back_index = transition_origin_end_to_index(ktn, end, origin)
                 weight=0.5*(ktn.at[index,'weight']+ktn.at[back_index,'weight'])
                 ktn.at[index,'weight']=weight
                 ktn.at[back_index,'weight']=weight
-            except:
+            else:
                 weight=0.5*ktn.at[index,'weight']
                 ktn.at[index,'weight']=weight
                 back_index=ktn.shape[0]
-                add_transition(ktn, back_index, index, weight=weight, origin_index=True, end_index=True)
+                add_transition(ktn, end, origin, weight=weight)
             ktn.at[index,'symmetrized']=True
             ktn.at[back_index,'symmetrized']=True
 
@@ -104,30 +94,28 @@ def select(ktn, selection):
 
 ## Aux
 
-def _transition_origin_end_to_index(ktn, origin, end):
-
-    return ktn.loc[(ktn['origin_index']==origin) & (ktn['end_index']==end)].index[0]
-
-transition_origin_end_to_index = np.vectorize(_transition_origin_end_to_index, excluded=[0])
-
-def _microstate_out_degree_from_microstate(ktn, index):
-
-    return ktn['origin_index'].isin([index]).sum()
-
-_microstate_out_degree_from_microstate_vect = np.vectorize(_microstate_out_degree_from_microstate, excluded=[0])
-
-def _microstate_in_degree_from_microstate(ktn, index):
-
-    return ktn['end_index'].isin([index]).sum()
-
-_microstate_in_degree_from_microstate_vect = np.vectorize(_microstate_in_degree_from_microstate, excluded=[0])
-
-
-def _microstate_weight_from_microstate(ktn, index):
-
-    return ktn[ktn['end_index'].isin([index])]['weight'].sum()
-
-_microstate_weight_from_microstate_vect = np.vectorize(_microstate_weight_from_microstate, excluded=[0])
+#def transition_origin_end_to_index(ktn, origin, end):
+#
+#    return ktn.loc[(ktn['origin_index']==origin) & (ktn['end_index']==end)].index[0]
+#
+#def _microstate_out_degree_from_microstate(ktn, index):
+#
+#    return ktn['origin_index'].isin([index]).sum()
+#
+#_microstate_out_degree_from_microstate_vect = np.vectorize(_microstate_out_degree_from_microstate, excluded=[0])
+#
+#def _microstate_in_degree_from_microstate(ktn, index):
+#
+#    return ktn['end_index'].isin([index]).sum()
+#
+#_microstate_in_degree_from_microstate_vect = np.vectorize(_microstate_in_degree_from_microstate, excluded=[0])
+#
+#
+#def _microstate_weight_from_microstate(ktn, index):
+#
+#    return ktn[ktn['end_index'].isin([index])]['weight'].sum()
+#
+#_microstate_weight_from_microstate_vect = np.vectorize(_microstate_weight_from_microstate, excluded=[0])
 
 
 ## from microstate

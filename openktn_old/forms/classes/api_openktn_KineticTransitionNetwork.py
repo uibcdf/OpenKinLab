@@ -30,11 +30,11 @@ def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=F
     return api.add_transition(ktn, origin, end, weight=weight, origin_index=origin_index,
                               end_index=end_index)
 
-def microstate_in(ktn, name=None, index=None):
+def microstate_is_in(ktn, name=None, index=None):
 
     return api.microstate_in(ktn, name=name, index=index)
 
-def transition_in(ktn, origin, end, origin_index=False, end_index=False):
+def transition_is_in(ktn, origin, end, origin_index=False, end_index=False):
 
     return api.transition_in(ktn, origin, end, origin_index=origin_index, end_index=end_index)
 
@@ -48,7 +48,7 @@ def update_probabilities(ktn):
 
 def symmetrize(ktn):
 
-    return api.update_symmetrize(ktn)
+    return api.symmetrize(ktn)
 
 def select(ktn, selection):
 

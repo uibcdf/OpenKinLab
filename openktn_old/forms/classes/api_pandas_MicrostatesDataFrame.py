@@ -14,62 +14,34 @@ info=["",""]
 
 # Multitool
 
-def new(n_microstates=0, temperature=None, time_step=None):
+def new(temperature=None, time_step=None):
 
     ktn = pandas_MicrostatesDataFrame()
 
-    if n_microstates>0:
-        add_microstate(ktn, index=n_microstates)
-
     return ktn
 
-def add_microstate(ktn, name=None, index=None):
+def add_microstate(ktn, name=None):
 
     n_microstates=ktn.shape[0]
 
-    if name is not None:
-        if index is not None:
-            ktn.at[index, 'index']=index
-            ktn.at[index, 'name']=name
-            ktn.at[index, 'weight']=0.0
-            ktn.at[index, 'probability']=0.0
-        else:
-            ktn.at[n_microstates, 'index']=n_microstates
-            ktn.at[n_microstates, 'name']=name
-            ktn.at[n_microstates, 'weight']=0.0
-            ktn.at[n_microstates, 'probability']=0.0
-    elif index is None:
-        ktn.at[n_microstates, 'index']=n_microstates
-        ktn.at[n_microstates, 'name']=n_microstates
-        ktn.at[n_microstates, 'weight']=0.0
-        ktn.at[n_microstates, 'probability']=0.0
-    else:
-        for ii in range(n_microstates, index+1):
-            ktn.at[ii, 'index']=ii
-            ktn.at[ii, 'name']=ii
-            ktn.at[ii, 'weight']=0.0
-            ktn.at[ii, 'probability']=0.0
+    if name is None:
+        name = n_microstates
 
-def add_transition(ktn, origin, end, weight=0.0, origin_index=False, end_index=False):
+    ktn.at[n_microstates, 'name']=name
+    ktn.at[n_microstates, 'weight']=0.0
+    ktn.at[n_microstates, 'probability']=0.0
+
+def add_transition(ktn, origin, end, weight=0.0):
 
     raise NotImplementedError("This method does not apply for this KTN form.")
 
-def microstate_in(ktn, name=None, index=None):
+def microstate_is_in(ktn, name):
 
-    if ktn.shape[0]==0:
-        return False
-    elif name is not None:
-        output = ktn['name'].isin([name]).any()
-    elif index is not None:
-        output = ktn['index'].isin([index]).any()
-    else:
-        raise ValueError
+    return (ktn.name.to_numpy()==name).any()
 
-    return output
+def transition_is_in(ktn, origin, end):
 
-def transition_in(ktn, origin, end, origin_index=False, end_index=False):
-
-    raise NotImplementedError("This method does not apply for this KTN form.")
+    return ((ktn.origin.to_numpy()==origin)*(ktn.end.to_numpy()==end)) .any()
 
 def update_weights(ktn):
 
@@ -103,102 +75,95 @@ microstate_name_to_index = np.vectorize(_microstate_name_to_index, excluded=[0])
 
 ## from microstate
 
-def get_index_from_microstate(ktn, indices='all'):
+def get_index_from_microstate(ktn, names=None):
 
-    return get_microstate_index_from_microstate(ktn, indices=indices)
+    return get_microstate_index_from_microstate(ktn, names=names)
 
-def get_name_from_microstate(ktn, indices='all'):
+def get_name_from_microstate(ktn, names=None):
 
-    return get_microstate_name_from_microstate(ktn, indices=indices)
+    return get_microstate_name_from_microstate(ktn, names=names)
 
-def get_weight_from_microstate(ktn, indices='all'):
+def get_weight_from_microstate(ktn, names=None):
 
-    return get_microstate_weight_from_microstate(ktn, indices=indices)
+    return get_microstate_weight_from_microstate(ktn, names=names)
 
-def get_probability_from_microstate(ktn, indices='all'):
+def get_probability_from_microstate(ktn, names=None):
 
-    return get_microstate_probability_from_microstate(ktn, indices=indices)
+    return get_microstate_probability_from_microstate(ktn, names=names)
 
-def get_degree_from_microstate(ktn, indices='all'):
+def get_degree_from_microstate(ktn, names=None):
 
-    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+    return get_microstate_out_degree_from_microstate(ktn, names=names)
 
-def get_out_degree_from_microstate(ktn, indices='all'):
+def get_out_degree_from_microstate(ktn, names=None):
 
-    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+    return get_microstate_out_degree_from_microstate(ktn, names=names)
 
-def get_in_degree_from_microstate(ktn, indices='all'):
+def get_in_degree_from_microstate(ktn, names=None):
 
-    return get_microstate_in_degree_from_microstate(ktn, indices=indices)
+    return get_microstate_in_degree_from_microstate(ktn, names=names)
 
-def get_microstate_index_from_microstate(ktn, indices='all'):
-
-    output = None
-    if indices is 'all':
-        output = ktn.loc[:,'index'].to_numpy()
-    else:
-        output = ktn.loc[indices,'index'].to_numpy()
+def _vf(array_names, name):
+    output=np.argwhere(array_names==name)[0][0]
     return output
 
-def get_microstate_name_from_microstate(ktn, indices='all'):
+vf = np.vectorize(_vf, excluded[0])
 
-    output = None
-    if indices is 'all':
-        output = ktn.loc[:,'name'].to_numpy()
+def get_microstate_index_from_microstate(ktn, names=None):
+
+    if names is None:
+        return ktn.index.to_numpy()
     else:
-        output = ktn.loc[indices,'name'].to_numpy()
-    return output
+        return vf(ktn.name.to_numpy(), names)
 
-def get_microstate_weight_from_microstate(ktn, indices='all'):
+def get_microstate_name_from_microstate(ktn, names=None):
 
-    output = None
-    if indices is 'all':
-        output = ktn.loc[:,'weight'].to_numpy()
+    if names is 'all':
+        return ktn.name.to_numpy()
     else:
+        return names
+
+def get_microstate_weight_from_microstate(ktn, names=None):
+
+    if names is 'all':
+        return ktn.weight.to_numpy()
+    else:
+        indices = get_microstate_index_from_microstate(ktn, names=names)
         output = ktn.loc[indices,'weight'].to_numpy()
-    return output
 
-def get_microstate_probability_from_microstate(ktn, indices='all'):
+def get_microstate_probability_from_microstate(ktn, names=None):
 
-    output = None
-    if indices is 'all':
-        output = ktn.loc[:,'probability'].to_numpy()
+    if names is 'all':
+        return = ktn.probability.to_numpy()
     else:
-        output = ktn.loc[indices,'probability'].to_numpy()
-    return output
+        indices = get_microstate_index_from_microstate(ktn, names=names)
+        return ktn.probability[indices].to_numpy()
 
-def get_microstate_degree_from_microstate(ktn, indices='all'):
+def get_microstate_degree_from_microstate(ktn, names=None):
 
-    return get_microstate_out_degree_from_microstate(ktn, indices=indices)
+    return get_microstate_out_degree_from_microstate(ktn, names=names)
 
-def get_microstate_out_degree_from_microstate(ktn, indices='all'):
+def get_microstate_out_degree_from_microstate(ktn, names=None):
 
-    ouput=None
-    if indices is 'all':
-        output = np.fill(np.nan, ktn.shape[0])
+    if names is None:
+        return np.fill(np.nan, ktn.shape[0])
     else:
-        output = np.fill(np.nan, indices.shape[0])
+        return np.fill(np.nan, names.shape[0])
 
-    return output
+def get_microstate_in_degree_from_microstate(ktn, names=None):
 
-def get_microstate_in_degree_from_microstate(ktn, indices='all'):
-
-    ouput=None
-    if indices is 'all':
-        output = np.fill(np.nan, ktn.shape[0])
+    if names is None:
+        return np.fill(np.nan, ktn.shape[0])
     else:
-        output = np.fill(np.nan, indices.shape[0])
+        return np.fill(np.nan, names.shape[0])
 
-    return output
+def get_component_from_microstate(ktn, names=None):
 
-def get_component_index_from_microstate(ktn, indices='all'):
-
-    output = None
     if indices is 'all':
-        output = ktn.loc[:,'component_index'].to_numpy()
+        return ktn.component.to_numpy()
     else:
-        output = ktn.loc[indices,'component_index'].to_numpy()
-    return output
+        indices = get_microstate_index_from_microstate(ktn, names=names)
+        return ktn.component[indices].to_numpy()
 
 def get_basin_index_from_microstate(ktn, indices='all'):
 
