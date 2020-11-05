@@ -18,8 +18,11 @@ dict_is_form={}
 dict_new={}
 dict_add_microstate={}
 dict_add_transition={}
-dict_update_weights={}
+dict_microstate_index={}
+dict_transition_index={}
+dict_update_microstates_weights={}
 dict_update_probabilities={}
+dict_symmetrize={}
 dict_select={}
 dict_get={}
 dict_extract={}
@@ -37,8 +40,11 @@ for form_name in list_forms:
     dict_new[form_name]= {}
     dict_add_microstate[form_name]= {}
     dict_add_transition[form_name]= {}
-    dict_update_weights[form_name]= {}
+    dict_microstate_index[form_name]= {}
+    dict_transition_index[form_name]= {}
+    dict_update_microstates_weights[form_name]= {}
     dict_update_probabilities[form_name]= {}
+    dict_symmetrize[form_name]= {}
     dict_select[form_name]= {}
     dict_get[form_name]= {}
     dict_extract[form_name]= {}
@@ -66,10 +72,16 @@ for form_name in list_forms:
         dict_add_microstate[form_name]=getattr(dict_api_forms[form_name],'add_microstate')
     if 'add_transition' in dict_api_forms[form_name].__dict__.keys():
         dict_add_transition[form_name]=getattr(dict_api_forms[form_name],'add_transition')
-    if 'update_weights' in dict_api_forms[form_name].__dict__.keys():
-        dict_update_weights[form_name]=getattr(dict_api_forms[form_name],'update_weights')
+    if 'microstate_index' in dict_api_forms[form_name].__dict__.keys():
+        dict_microstate_index[form_name]=getattr(dict_api_forms[form_name],'microstate_index')
+    if 'transition_index' in dict_api_forms[form_name].__dict__.keys():
+        dict_transition_index[form_name]=getattr(dict_api_forms[form_name],'transition_index')
+    if 'update_microstates_weights' in dict_api_forms[form_name].__dict__.keys():
+        dict_update_microstates_weights[form_name]=getattr(dict_api_forms[form_name],'update_microstates_weights')
     if 'update_probabilities' in dict_api_forms[form_name].__dict__.keys():
         dict_update_probabilities[form_name]=getattr(dict_api_forms[form_name],'update_probabilities')
+    if 'symmetrize' in dict_api_forms[form_name].__dict__.keys():
+        dict_symmetrize[form_name]=getattr(dict_api_forms[form_name],'symmetrize')
     if 'select' in dict_api_forms[form_name].__dict__.keys():
         dict_select[form_name]=getattr(dict_api_forms[form_name],'select')
     if 'get' in dict_api_forms[form_name].__dict__.keys():
