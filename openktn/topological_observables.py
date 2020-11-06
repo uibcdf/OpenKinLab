@@ -119,6 +119,7 @@ def components(ktn, names=None):
 
         from pandas import isnull
 
+        ktn.microstates.component=None
         aux_dict=ktn.transitions.groupby(by='origin')['end'].apply(set)
         n_components=0
 
@@ -127,8 +128,8 @@ def components(ktn, names=None):
             ii_neighbors = aux_dict.pop(ii)
             ii_component = ktn.microstates.component[ktn.microstates.name.isin([ii])].to_numpy()[0]
             if isnull(ii_component):
-                box = ii_neighbors
-                in_component = box.union({ii})
+                box = ii_neighbors-{ii}
+                in_component = {ii}
                 while len(box):
                     jj=box.pop()
                     in_component.add(jj)

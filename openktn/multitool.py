@@ -42,7 +42,7 @@ def get_form(ktn):
         except:
             raise NotImplementedError("This KTN's form has not been implemented yet")
 
-def KTN(form=None, temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
+def KTN(form='pandas.KineticTransitionNetwork', temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
 
     tmp_ktn = dict_new[form](temperature=temperature, time_step=time_step)
     return tmp_ktn

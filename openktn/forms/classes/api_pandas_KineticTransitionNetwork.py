@@ -33,18 +33,19 @@ def add_microstate(ktn, name=None):
 
 def add_transition(ktn, origin, end, weight=0.0):
 
-    index_origin = _microstate_index(ktn, origin)
-    index_end = _microstate_index(ktn, end)
-
     new=False
+
+    index_origin = _microstate_index(ktn, origin)
 
     if index_origin is None:
         add_microstate(ktn, origin)
         new=True
 
-    if index_end is None:
-        add_microstate(ktn, end)
-        new=True
+    if origin!=end:
+        index_end = _microstate_index(ktn, end)
+        if index_end is None:
+            add_microstate(ktn, end)
+            new=True
 
     if new:
         n_transitions=ktn.transitions.shape[0]
