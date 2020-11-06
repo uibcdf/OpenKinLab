@@ -42,7 +42,7 @@ def get_form(ktn):
         except:
             raise NotImplementedError("This KTN's form has not been implemented yet")
 
-def kinetic_transition_network(form=None, temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
+def KTN(form=None, temperature=0.0*unit.kelvin, time_step=0.0*unit.nanoseconds):
 
     tmp_ktn = dict_new[form](temperature=temperature, time_step=time_step)
     return tmp_ktn
@@ -92,7 +92,7 @@ def symmetrize(ktn):
 def select(ktn, selection=None):
     raise NotImplementedError
 
-def get(ktn, target='microstate', name=None, **kwargs):
+def get(ktn, target='microstate', names=None, **kwargs):
 
     form = get_form(ktn)
     target = singular_target(target)
@@ -102,12 +102,12 @@ def get(ktn, target='microstate', name=None, **kwargs):
 
     if form in ['pandas.KineticTransitionNetwork']:
 
-        if name is None:
+        if names is None:
             indices='all'
         elif target=='microstate':
-            indices=microstate_index(ktn, name=name)
+            indices=microstate_index(ktn, name=names)
         elif target=='transition':
-            indices=transition_index(ktn, origin=name[:,0], end=name[:,1])
+            indices=transition_index(ktn, origin=names[:,0], end=names[:,1])
 
         for attribute in attributes:
             result = dict_get[form][target][attribute](ktn, indices=indices)
@@ -116,7 +116,7 @@ def get(ktn, target='microstate', name=None, **kwargs):
     else:
 
         for attribute in attributes:
-            result = dict_get[form][target][attribute](ktn, name=name)
+            result = dict_get[form][target][attribute](ktn, names=names)
             results.append(result)
 
     if len(results)==1:
