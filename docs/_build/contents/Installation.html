@@ -189,28 +189,19 @@
 </style>
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>The latest “stable” version of OpenKinNet can be installed from the UIBCDF Anaconda channel:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda -c uibcdf openkinnet
-</pre></div>
-</div>
-<p>If you want to work with the not so tested last beta version, the installation command is the following:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c uibcdf/label/dev openkinnet
-</pre></div>
-</div>
-<p>The former beta version is nothing but a quenched version from the main github repository of this project which it is done from time to time with few scruples. The raw code fully alive can be installed from this github repo as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/uibcdf/OpenKinNet.git
-<span class="nb">cd</span> OpenKinNet
+<p>At this moment there is only a very unstable developing version. This version can be installed from the github repository as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/uibcdf/OpenKTN.git
+<span class="nb">cd</span> OpenKTN
 python setup.py develop
 </pre></div>
 </div>
-<p>In the first two cases, OpenKinNet can be uninstalled with conda:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda remove openkinnet
-</pre></div>
-</div>
-<p>But if you installed OpenKinNet straight from its github central repository, do the following to uninstall it:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip uninstall openkinnet
-</pre></div>
-</div>
+<p>There is no automatic mechanism to install the dependencies. So you have to be sure that the following packages are installed in your os or working python environment:</p>
+<ul class="simple">
+<li><p>Numpy</p></li>
+<li><p>Pandas</p></li>
+<li><p>Networks</p></li>
+<li><p>Openmm</p></li>
+</ul>
 </div>
 
 
