@@ -90,7 +90,9 @@ transition_index = np.vectorize(_transition_index, excluded=[0])
 def update_microstates_weights(ktn):
 
     groups_weights = ktn.transitions.groupby(by='origin')['weight'].sum()
-    ktn.microstates.weight = groups_weights[ktn.microstates.name].to_numpy()
+    for index in ktn.microstates.index:
+        if ktn.microstates.at[index,'name'] in groups_weights:
+            ktn.microstates.at[index,'weight'] = groups_weights[ktn.microstates.at[index,'name']]
 
 def update_probabilities(ktn):
 
