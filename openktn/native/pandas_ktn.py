@@ -1,19 +1,17 @@
 from pandas import DataFrame
 
-class Pandas_KineticTransitionNetwork():
+class PandasKTN():
 
-    def __init__(self, temperature=None, time_step=None):
+    def __init__(self):
 
-        from openktn.native.network import attributes as network_attributes
+        from .pandas_microstates import PandasMicrostates
+        from .pandas_microstates import PandasTransitions
 
-        self.microstates = Pandas_MicrostatesDataFrame()
-        self.transitions = Pandas_TransitionsDataFrame()
+        self.microstates = PandasMicrostates()
+        self.transitions = PandasTransitions()
 
-        for attribute, value in network_attributes.items():
-            setattr(self, attribute, value)
-
-        self.temperature=temperature
-        self.time_step=time_step
+        self.temperature = None
+        self.time = None
 
 class Pandas_MicrostatesDataFrame(DataFrame):
 

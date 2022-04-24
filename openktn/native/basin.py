@@ -1,14 +1,15 @@
-class Transition():
+
+class Basin():
 
     def __init__(self):
 
-        self.origin  = None
-        self.end = None
+        self.index  = None
+        self.label  = None
+        self.microstates = None
         self.weight = 0.0
         self.probability = 0.0
 
-        self.symmetrized = False
-
+        self.coordinates = None
         self.color = None
         self.size = None
 
